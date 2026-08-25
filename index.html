@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>the MATH office - 道路工程计算器门户</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
+        .card-hover { transition: transform 0.3s, box-shadow 0.3s; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15); }
+        .card-hover:hover .card-icon { transform: scale(1.1); }
+        .card-icon { transition: transform 0.3s; }
+        html { scroll-behavior: smooth; }
+        body { transition: background-color 0.3s, color 0.3s; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-200 min-h-screen">
+
+    <!-- 顶部导航 -->
+    <nav class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-cubes text-indigo-500 text-2xl"></i>
+                <span class="text-lg font-bold">the MATH office</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fa fa-moon-o dark:hidden"></i>
+                    <i class="fa fa-sun-o hidden dark:block"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero 区域 -->
+    <header class="container mx-auto px-4 pt-12 pb-8 text-center">
+        <div class="fade-in-up" style="animation-delay: 0.1s">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                the MATH office
+            </h1>
+        </div>
+        <div class="fade-in-up" style="animation-delay: 0.2s">
+            <p class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+                道路工程计算器门户 —— 支持离线使用的工程计算工具集合
+            </p>
+        </div>
+    </header>
+
+    <!-- 模块卡片区域 -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <!-- 道路工程计算器集合 -->
+            <a href="daoqiaojisuan/index.html" class="fade-in-up block" style="animation-delay: 0.3s">
+                <div class="card-hover bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="h-2 bg-gradient-to-r from-blue-500 via-indigo-400 to-emerald-400"></div>
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="card-icon w-14 h-14 rounded-xl bg-gradient-to-br from-blue-100 to-emerald-100 dark:from-blue-900 dark:to-emerald-900 flex items-center justify-center">
+                                <i class="fa fa-calculator text-blue-500 text-2xl"></i>
+                            </div>
+                            <div class="flex flex-col items-end gap-1">
+                                <span class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-3 py-1 text-xs rounded-full">10个计算器</span>
+                                <span class="bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-3 py-1 text-xs rounded-full">PWA离线</span>
+                            </div>
+                        </div>
+                        <h2 class="text-2xl font-bold mb-2">道路工程计算器集合</h2>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">
+                            包含砂子堆积密度、石子针片状、角度（度分秒）、水灰比、水泥细度、水泥稠度、混凝土坍落度、水泥胶砂强度、灰砂比等工程计算工具。支持PWA安装与离线使用。
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded"><i class="fa fa-moon-o mr-1"></i>深色模式</span>
+                            <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded"><i class="fa fa-chart mr-1"></i>Chart.js图表</span>
+                            <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded"><i class="fa fa-download mr-1"></i>可安装应用</span>
+                            <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded"><i class="fa fa-mobile mr-1"></i>移动适配</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- 快捷链接区 -->
+        <div class="fade-in-up max-w-4xl mx-auto mt-10" style="animation-delay: 0.5s">
+            <h2 class="text-lg font-bold mb-4 text-center">计算器快捷链接</h2>
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="daoqiaojisuan/index.html" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm hover:border-orange-400 dark:hover:border-orange-500 transition-colors card-hover">
+                    <i class="fa fa-angle-up text-orange-500 mr-1"></i> 角度计算器
+                </a>
+                <a href="daoqiaojisuan/water_cement_ratio_calculator.html" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm hover:border-blue-400 dark:hover:border-blue-500 transition-colors card-hover">
+                    <i class="fa fa-tint text-cyan-500 mr-1"></i> 水灰比
+                </a>
+                <a href="daoqiaojisuan/sand_density_calculator.html" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm hover:border-blue-400 dark:hover:border-blue-500 transition-colors card-hover">
+                    <i class="fa fa-th text-blue-500 mr-1"></i> 砂子密度
+                </a>
+                <a href="daoqiaojisuan/needle_shape_calculator.html" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm hover:border-blue-400 dark:hover:border-blue-500 transition-colors card-hover">
+                    <i class="fa fa-cubes text-green-500 mr-1"></i> 针片状
+                </a>
+                <a href="daoqiaojisuan/concrete_slump_calculator.html" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm hover:border-blue-400 dark:hover:border-blue-500 transition-colors card-hover">
+                    <i class="fa fa-industry text-amber-500 mr-1"></i> 坍落度
+                </a>
+                <a href="daoqiaojisuan/cement_fineness_calculator.html" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm hover:border-blue-400 dark:hover:border-blue-500 transition-colors card-hover">
+                    <i class="fa fa-flask text-purple-500 mr-1"></i> 水泥细度
+                </a>
+                <a href="daoqiaojisuan/cement_consistency_calculator.html" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm hover:border-blue-400 dark:hover:border-blue-500 transition-colors card-hover">
+                    <i class="fa fa-tachometer text-red-500 mr-1"></i> 水泥稠度
+                </a>
+                <a href="daoqiaojisuan/sand_sieve_analysis_calculator.html" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm hover:border-blue-400 dark:hover:border-blue-500 transition-colors card-hover">
+                    <i class="fa fa-bar-chart text-teal-500 mr-1"></i> 砂筛分
+                </a>
+                <a href="daoqiaojisuan/cement_mortar_strength_calculator.html" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm hover:border-blue-400 dark:hover:border-blue-500 transition-colors card-hover">
+                    <i class="fa fa-gavel text-indigo-500 mr-1"></i> 胶砂强度
+                </a>
+                <a href="daoqiaojisuan/cement_paste_mortar_calculator.html" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm hover:border-blue-400 dark:hover:border-blue-500 transition-colors card-hover">
+                    <i class="fa fa-cog text-gray-500 mr-1"></i> 灰砂比综合
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="border-t border-gray-200 dark:border-gray-700 mt-12">
+        <div class="container mx-auto px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-500">
+            <p>the MATH office - 道路工程计算器门户</p>
+            <p class="mt-1">道路工程计算工具集合 | 支持PWA离线使用 | 本地部署，非盈利使用</p>
+        </div>
+    </footer>
+
+    <script>
+        // 深色模式
+        const themeToggle = document.getElementById('theme-toggle');
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+        themeToggle.addEventListener('click', function() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+    </script>
+</body>
+</html>
