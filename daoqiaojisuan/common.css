@@ -206,3 +206,24 @@ button[type="submit"]:hover,
 .calculate-btn:hover {
     background-color: var(--primary-dark);
 }
+
+/* ---------- 统一页脚 ---------- */
+footer {
+    margin-top: 2rem;
+    padding: 1.25rem 0;
+    text-align: center;
+    color: var(--lighter-text, #94a3b8);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+body.dark-mode footer {
+    border-top-color: var(--dark-border, #334155);
+    color: var(--lighter-text, #94a3b8);
+}
+
+/* ---------- 统一主内容区域边距 ---------- */
+.main-content,
+.page-content {
+    padding-bottom: 2rem;
+}
