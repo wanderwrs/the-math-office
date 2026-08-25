@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>石子针片状颗粒含量计算器</title>
+    <style>
+        /* 全局样式 */
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --light-bg: #f8fafc;
+            --light-text: #1e293b;
+            --light-card: #ffffff;
+            --light-border: #e2e8f0;
+            --light-input: #f1f5f9;
+            --dark-bg: #0f172a;
+            --dark-text: #f1f5f9;
+            --dark-card: #1e293b;
+            --dark-border: #334155;
+            --dark-input: #475569;
+            --border-radius: 0.75rem;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--light-text);
+            background-color: var(--light-bg);
+            transition: var(--transition);
+        }
+
+        body.dark-mode {
+            color: var(--dark-text);
+            background-color: var(--dark-bg);
+        }
+
+        /* 容器 */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            background-color: var(--light-card);
+            box-shadow: var(--box-shadow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .navbar {
+            background-color: var(--dark-card);
+        }
+
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-theme {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--secondary-color);
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .btn-theme:hover {
+            background-color: var(--light-input);
+        }
+
+        body.dark-mode .btn-theme:hover {
+            background-color: var(--dark-input);
+        }
+
+        .btn-home {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .btn-home:hover {
+            background-color: var(--light-input);
+        }
+
+        body.dark-mode .btn-home:hover {
+            background-color: var(--dark-input);
+        }
+
+        /* 主内容 */
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .page-title p {
+            color: var(--secondary-color);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 卡片 */
+        .card {
+            background-color: var(--light-card);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .card {
+            background-color: var(--dark-card);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 0.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* 表单 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--light-border);
+            border-radius: var(--border-radius);
+            background-color: var(--light-input);
+            color: var(--light-text);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .form-input {
+            border-color: var(--dark-border);
+            background-color: var(--dark-input);
+            color: var(--dark-text);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .input-with-unit {
+            position: relative;
+        }
+
+        .input-unit {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+            pointer-events: none;
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        /* 按钮 */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* 结果区域 */
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        body.dark-mode .result-item {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .result-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-normal {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .status-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        /* 响应式布局 */
+        @media (min-width: 992px) {
+            .content-wrapper {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+    <!-- 统一样式 -->
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="index.html" class="navbar-brand">🧮 道路工程计算器</a>
+            <div class="navbar-actions">
+                <a href="index.html" class="btn-home">🏠 返回首页</a>
+                <button id="theme-toggle" class="btn-theme" title="切换主题">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <div class="container">
+            <!-- 页面标题 -->
+            <div class="page-title">
+                <h1>石子针片状颗粒含量计算器</h1>
+                <p>本计算器用于计算石子中针片状颗粒的含量百分比，帮助评估骨料的颗粒形状指标</p>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="content-wrapper">
+                <!-- 计算器表单区域 -->
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>🔬</span>
+                            <h2 class="card-title">实验数据输入</h2>
+                        </div>
+                        
+                        <form id="shape-calculator-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="sample-name" class="form-label">样品编号/名称</label>
+                                    <input type="text" id="sample-name" class="form-input" placeholder="例如：S-01">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="test-date" class="form-label">测试日期</label>
+                                    <input type="date" id="test-date" class="form-input">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="total-mass" class="form-label">样品总质量</label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="total-mass" class="form-input" placeholder="输入样品总质量" min="0" step="0.01" required>
+                                    <span class="input-unit">g</span>
+                                </div>
+                                <p id="total-mass-error" class="error-message">请输入有效的质量值</p>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="needle-mass" class="form-label">针状颗粒质量</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" id="needle-mass" class="form-input" placeholder="输入针状颗粒质量" min="0" step="0.01" required>
+                                        <span class="input-unit">g</span>
+                                    </div>
+                                    <p id="needle-mass-error" class="error-message">请输入有效的质量值</p>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="flat-mass" class="form-label">片状颗粒质量</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" id="flat-mass" class="form-input" placeholder="输入片状颗粒质量" min="0" step="0.01" required>
+                                        <span class="input-unit">g</span>
+                                    </div>
+                                    <p id="flat-mass-error" class="error-message">请输入有效的质量值</p>
+                                </div>
+                            </div>
+                            
+                            <div class="btn-group">
+                                <button type="submit" id="calculate-btn" class="btn btn-primary">
+                                    📊 计算含量
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    🔄 重置
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- 说明卡片 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span>ℹ️</span>
+                            <h2 class="card-title">计算说明</h2>
+                        </div>
+                        <p><strong>针片状颗粒定义：</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 1rem;">
+                            <li>针状颗粒：长度大于该颗粒所属粒级平均粒径的2.4倍的颗粒</li>
+                            <li>片状颗粒：厚度小于该颗粒所属粒级平均粒径的0.4倍的颗粒</li>
+                        </ul>
+                        <p><strong>计算公式：</strong></p>
+                        <ul style="margin-left: 1.5rem;">
+                            <li>针状颗粒含量 = (针状颗粒质量 / 样品总质量) × 100%</li>
+                            <li>片状颗粒含量 = (片状颗粒质量 / 样品总质量) × 100%</li>
+                            <li>总针片状含量 = [(针状颗粒质量 + 片状颗粒质量) / 样品总质量] × 100%</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 结果显示区域 -->
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>📈</span>
+                            <h2 class="card-title">计算结果</h2>
+                        </div>
+                        
+                        <div id="result-container">
+                            <div class="result-item">
+                                <span class="result-label">样品信息</span>
+                                <span id="result-sample" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">针状颗粒含量</span>
+                                <span id="result-needle-content" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">片状颗粒含量</span>
+                                <span id="result-flat-content" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">总针片状含量</span>
+                                <span id="result-total-content" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">结果评定</span>
+                                <span id="result-status" class="result-status">等待计算</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 设置默认日期为今天
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('test-date').value = today;
+            
+            // 初始化主题
+            if (localStorage.getItem('theme') === 'dark' || 
+                (!localStorage.getItem('theme') && 
+                 window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark-mode');
+            }
+        });
+
+        // 主题切换功能
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            this.innerHTML = isDarkMode ? '☀️' : '🌙';
+        });
+
+        // 表单提交事件处理
+        document.getElementById('shape-calculator-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateNeedleShapeContent();
+        });
+
+        // 重置按钮事件处理
+        this.addEventListener('reset', function() {
+            setTimeout(function() {
+                updateResult('--', '--', '--', '--', '等待计算');
+                hideErrors();
+            }, 0);
+        });
+
+        // 计算针片状颗粒含量
+        function calculateNeedleShapeContent() {
+            // 获取输入值
+            const sampleName = document.getElementById('sample-name').value || '未命名';
+            const totalMass = parseFloat(document.getElementById('total-mass').value);
+            const needleMass = parseFloat(document.getElementById('needle-mass').value);
+            const flatMass = parseFloat(document.getElementById('flat-mass').value);
+            
+            // 验证输入
+            let isValid = true;
+            hideErrors();
+            
+            if (isNaN(totalMass) || totalMass <= 0) {
+                showError('total-mass-error', '请输入有效的总质量值');
+                isValid = false;
+            }
+            
+            if (isNaN(needleMass) || needleMass < 0) {
+                showError('needle-mass-error', '请输入有效的针状颗粒质量值');
+                isValid = false;
+            }
+            
+            if (isNaN(flatMass) || flatMass < 0) {
+                showError('flat-mass-error', '请输入有效的片状颗粒质量值');
+                isValid = false;
+            }
+            
+            if (needleMass + flatMass > totalMass) {
+                showError('total-mass-error', '针状和片状颗粒质量之和不能大于总质量');
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            // 计算含量
+            const needleContent = (needleMass / totalMass) * 100;
+            const flatContent = (flatMass / totalMass) * 100;
+            const totalContent = ((needleMass + flatMass) / totalMass) * 100;
+            
+            // 格式化结果
+            const formattedNeedle = needleContent.toFixed(2) + '%';
+            const formattedFlat = flatContent.toFixed(2) + '%';
+            const formattedTotal = totalContent.toFixed(2) + '%';
+            
+            // 评定结果
+            let statusText, statusClass;
+            if (totalContent <= 5) {
+                statusText = '合格 (≤5%)';
+                statusClass = 'status-normal';
+            } else if (totalContent <= 10) {
+                statusText = '可用 (5%-10%)';
+                statusClass = 'status-warning';
+            } else {
+                statusText = '不合格 (>10%)';
+                statusClass = 'status-error';
+            }
+            
+            // 更新结果显示
+            updateResult(sampleName, formattedNeedle, formattedFlat, formattedTotal, statusText, statusClass);
+        }
+
+        // 更新结果显示
+        function updateResult(sample, needle, flat, total, status, statusClass) {
+            document.getElementById('result-sample').textContent = sample;
+            document.getElementById('result-needle-content').textContent = needle;
+            document.getElementById('result-flat-content').textContent = flat;
+            document.getElementById('result-total-content').textContent = total;
+            
+            const statusElement = document.getElementById('result-status');
+            statusElement.textContent = status;
+            
+            // 移除所有状态类
+            statusElement.classList.remove('status-normal', 'status-warning', 'status-error');
+            
+            // 添加新的状态类
+            if (statusClass) {
+                statusElement.classList.add(statusClass);
+            }
+        }
+
+        // 显示错误信息
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        // 隐藏所有错误信息
+        function hideErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(element => {
+                element.style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>
