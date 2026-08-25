@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>混凝土拌合物稠度实验（塌落度法）计算器</title>
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --primary-dark: #1976D2;
+            --primary-light: #64B5F6;
+            --accent-color: #FF5722;
+            --error-color: #F44336;
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
+            --text-color: #333;
+            --light-text: #666;
+            --lighter-text: #999;
+            --light-bg: #f5f5f5;
+            --card-bg: #fff;
+            --border-color: #ddd;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        .dark-mode {
+            --primary-color: #42A5F5;
+            --primary-dark: #1E88E5;
+            --primary-light: #90CAF9;
+            --accent-color: #FF7043;
+            --error-color: #EF5350;
+            --success-color: #66BB6A;
+            --warning-color: #FFA726;
+            --text-color: #eee;
+            --light-text: #bbb;
+            --lighter-text: #999;
+            --light-bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --border-color: #444;
+            --shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            transition: var(--transition);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .description {
+            color: var(--light-text);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 30px;
+            transition: var(--transition);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: 120px;
+        }
+
+        .calculate-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .calculate-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .reset-btn {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .reset-btn:hover {
+            background-color: var(--lighter-text);
+            color: var(--card-bg);
+        }
+
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .result-item {
+            background-color: var(--light-bg);
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .result-label {
+            color: var(--light-text);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .result-unit {
+            font-size: 1rem;
+            color: var(--light-text);
+            margin-left: 5px;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .result-table th,
+        .result-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .result-table th {
+            background-color: var(--light-bg);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .result-table tr:hover {
+            background-color: var(--light-bg);
+        }
+
+        .evaluation-section {
+            background-color: var(--light-bg);
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+
+        .evaluation-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .evaluation-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .evaluation-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .evaluation-content {
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        .info-section {
+            background-color: rgba(33, 150, 243, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 0 6px 6px 0;
+            margin-top: 30px;
+        }
+
+        .info-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .info-section p {
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .info-section ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .info-section li {
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: var(--lighter-text);
+            font-size: 0.9rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .description {
+                font-size: 1rem;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+                top: 15px;
+                right: 15px;
+            }
+
+            .result-table th,
+            .result-table td {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    <!-- 统一样式 -->
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="index.html" class="navbar-brand">🧮 道路工程计算器</a>
+            <div class="navbar-actions">
+                <a href="index.html" class="btn-home">🏠 返回首页</a>
+                <button id="theme-toggle" class="btn-theme" title="切换主题">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>混凝土拌合物稠度实验（塌落度法）计算器</h1>
+            <p class="description">用于计算混凝土拌合物20千克试验用量、配合比，并提供和易性评价参考</p>
+        </header>
+
+        <div class="card">
+            <form id="concreteSlumpForm">
+                <h2 style="margin-bottom: 20px; color: var(--primary-color);">每立方米材料用量 (kg)</h2>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="cement">水泥 (kg)</label>
+                        <input type="number" id="cement" name="cement" min="0" step="0.1" placeholder="请输入水泥用量" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sand">砂子 (kg)</label>
+                        <input type="number" id="sand" name="sand" min="0" step="0.1" placeholder="请输入砂子用量" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stone">石子 (kg)</label>
+                        <input type="number" id="stone" name="stone" min="0" step="0.1" placeholder="请输入石子用量" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="water">水 (kg)</label>
+                        <input type="number" id="water" name="water" min="0" step="0.1" placeholder="请输入水用量" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="admixture">外加剂 (kg)</label>
+                        <input type="number" id="admixture" name="admixture" min="0" step="0.01" placeholder="请输入外加剂用量" required>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="calculate-btn">计算</button>
+                    <button type="reset" class="reset-btn">重置</button>
+                </div>
+            </form>
+
+            <div class="results-section" id="results" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: var(--primary-color);">计算结果</h2>
+                
+                <h3 style="margin-bottom: 15px; color: var(--primary-dark);">20千克试验材料用量</h3>
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>材料</th>
+                            <th>用量 (kg)</th>
+                            <th>用量 (g)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>水泥</td>
+                            <td id="cement20kg">0.00</td>
+                            <td id="cement20g">0</td>
+                        </tr>
+                        <tr>
+                            <td>砂子</td>
+                            <td id="sand20kg">0.00</td>
+                            <td id="sand20g">0</td>
+                        </tr>
+                        <tr>
+                            <td>石子</td>
+                            <td id="stone20kg">0.00</td>
+                            <td id="stone20g">0</td>
+                        </tr>
+                        <tr>
+                            <td>水</td>
+                            <td id="water20kg">0.00</td>
+                            <td id="water20g">0</td>
+                        </tr>
+                        <tr>
+                            <td>外加剂</td>
+                            <td id="admixture20kg">0.00</td>
+                            <td id="admixture20g">0</td>
+                        </tr>
+                        <tr style="font-weight: bold; background-color: var(--light-bg);">
+                            <td>合计</td>
+                            <td id="total20kg">20.00</td>
+                            <td id="total20g">20000</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin: 30px 0 15px; color: var(--primary-dark);">配合比（以水泥为1）</h3>
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>材料</th>
+                            <th>配合比</th>
+                            <th>用量比例 (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>水泥</td>
+                            <td id="cementRatio">1.00</td>
+                            <td id="cementPercent">0.0</td>
+                        </tr>
+                        <tr>
+                            <td>砂子</td>
+                            <td id="sandRatio">0.00</td>
+                            <td id="sandPercent">0.0</td>
+                        </tr>
+                        <tr>
+                            <td>石子</td>
+                            <td id="stoneRatio">0.00</td>
+                            <td id="stonePercent">0.0</td>
+                        </tr>
+                        <tr>
+                            <td>水</td>
+                            <td id="waterRatio">0.00</td>
+                            <td id="waterPercent">0.0</td>
+                        </tr>
+                        <tr>
+                            <td>外加剂</td>
+                            <td id="admixtureRatio">0.00</td>
+                            <td id="admixturePercent">0.0</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin: 30px 0 15px; color: var(--primary-dark);">混凝土性能指标</h3>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="result-label">水灰比</div>
+                        <div class="result-value" id="waterCementRatio">0.00</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">砂率</div>
+                        <div class="result-value" id="sandRatioValue">0.0</div>
+                        <span class="result-unit">%</span>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">每立方米总质量</div>
+                        <div class="result-value" id="totalWeight">0.0</div>
+                        <span class="result-unit">kg</span>
+                    </div>
+                </div>
+
+                <h3 style="margin: 30px 0 15px; color: var(--primary-dark);">和易性评价参考</h3>
+                <div class="evaluation-section">
+                    <div class="evaluation-item">
+                        <div class="evaluation-title">塌落度评价</div>
+                        <div class="evaluation-content" id="slumpEvaluation">
+                            请根据实测塌落度值对照表：<br>
+                            - 大流动性混凝土：≥160mm<br>
+                            - 流动性混凝土：100-150mm<br>
+                            - 塑性混凝土：50-90mm<br>
+                            - 干硬性混凝土：10-40mm
+                        </div>
+                    </div>
+                    <div class="evaluation-item">
+                        <div class="evaluation-title">粘聚性评价</div>
+                        <div class="evaluation-content">
+                            <strong>良好：</strong> 混凝土拌合物在运输和浇筑过程中不发生离析，手握成团，指压有弹性凹陷。<br>
+                            <strong>不良：</strong> 拌合物松散，出现石子下沉、砂浆上浮现象。
+                        </div>
+                    </div>
+                    <div class="evaluation-item">
+                        <div class="evaluation-title">保水性评价</div>
+                        <div class="evaluation-content">
+                            <strong>良好：</strong> 混凝土拌合物在运输和浇筑过程中不发生严重泌水，底部无明显积水。<br>
+                            <strong>不良：</strong> 拌合物表面有较多泌水或底部有明显积水。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>实验说明</h3>
+            <p><strong>计算原理：</strong></p>
+            <ul>
+                <li>20千克试验用量 = 每立方米用量 × 20 / 总质量</li>
+                <li>配合比 = 材料用量 / 水泥用量</li>
+                <li>水灰比 = 水用量 / 水泥用量</li>
+                <li>砂率 = 砂子用量 / (砂子用量 + 石子用量) × 100%</li>
+            </ul>
+            <p><strong>注意事项：</strong></p>
+            <ul>
+                <li>塌落度法适用于骨料最大粒径不大于40mm，塌落度不小于10mm的混凝土拌合物</li>
+                <li>实验前应校准塌落度筒和磅秤</li>
+                <li>严格按照标准试验方法进行装料、捣实和测量</li>
+                <li>和易性评价应在混凝土拌合物出机后立即进行</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 混凝土拌合物稠度实验计算器 | 道桥计算工具集</p>
+    </footer>
+
+    <script>
+        // 主题切换功能
+        const themeToggle = document.getElementById('theme-toggle');
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        // 检查本地存储中的主题偏好
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggle.textContent = '☀️';
+        } else if (currentTheme === 'light') {
+            document.body.classList.remove('dark-mode');
+            themeToggle.textContent = '🌙';
+        } else if (prefersDarkScheme.matches) {
+            document.body.classList.add('dark-mode');
+            themeToggle.textContent = '☀️';
+        }
+        
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            
+            let theme = 'light';
+            if (document.body.classList.contains('dark-mode')) {
+                theme = 'dark';
+                themeToggle.textContent = '☀️';
+            } else {
+                themeToggle.textContent = '🌙';
+            }
+            
+            localStorage.setItem('theme', theme);
+        });
+
+        // 计算功能
+        const form = document.getElementById('concreteSlumpForm');
+        const resultsDiv = document.getElementById('results');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            try {
+                // 获取输入值
+                const cement = parseFloat(document.getElementById('cement').value);
+                const sand = parseFloat(document.getElementById('sand').value);
+                const stone = parseFloat(document.getElementById('stone').value);
+                const water = parseFloat(document.getElementById('water').value);
+                const admixture = parseFloat(document.getElementById('admixture').value);
+                
+                // 验证输入
+                if (isNaN(cement) || cement <= 0 || 
+                    isNaN(sand) || sand < 0 || 
+                    isNaN(stone) || stone < 0 || 
+                    isNaN(water) || water <= 0 || 
+                    isNaN(admixture) || admixture < 0) {
+                    alert('请输入有效的材料用量');
+                    return;
+                }
+                
+                // 计算总质量
+                const totalWeight = cement + sand + stone + water + admixture;
+                
+                // 计算20千克试验用量
+                const scaleFactor = 20 / totalWeight;
+                const cement20kg = cement * scaleFactor;
+                const sand20kg = sand * scaleFactor;
+                const stone20kg = stone * scaleFactor;
+                const water20kg = water * scaleFactor;
+                const admixture20kg = admixture * scaleFactor;
+                
+                // 计算配合比（以水泥为1）
+                const sandRatio = sand / cement;
+                const stoneRatio = stone / cement;
+                const waterRatio = water / cement;
+                const admixtureRatio = admixture / cement;
+                
+                // 计算用量百分比
+                const cementPercent = (cement / totalWeight) * 100;
+                const sandPercent = (sand / totalWeight) * 100;
+                const stonePercent = (stone / totalWeight) * 100;
+                const waterPercent = (water / totalWeight) * 100;
+                const admixturePercent = (admixture / totalWeight) * 100;
+                
+                // 计算水灰比和砂率
+                const waterCementRatio = water / cement;
+                const sandRatioValue = (sand / (sand + stone)) * 100;
+                
+                // 显示20千克试验用量结果
+                document.getElementById('cement20kg').textContent = cement20kg.toFixed(2);
+                document.getElementById('cement20g').textContent = Math.round(cement20kg * 1000);
+                document.getElementById('sand20kg').textContent = sand20kg.toFixed(2);
+                document.getElementById('sand20g').textContent = Math.round(sand20kg * 1000);
+                document.getElementById('stone20kg').textContent = stone20kg.toFixed(2);
+                document.getElementById('stone20g').textContent = Math.round(stone20kg * 1000);
+                document.getElementById('water20kg').textContent = water20kg.toFixed(2);
+                document.getElementById('water20g').textContent = Math.round(water20kg * 1000);
+                document.getElementById('admixture20kg').textContent = admixture20kg.toFixed(4);
+                document.getElementById('admixture20g').textContent = Math.round(admixture20kg * 1000);
+                
+                // 显示配合比结果
+                document.getElementById('cementRatio').textContent = '1.00';
+                document.getElementById('cementPercent').textContent = cementPercent.toFixed(1);
+                document.getElementById('sandRatio').textContent = sandRatio.toFixed(2);
+                document.getElementById('sandPercent').textContent = sandPercent.toFixed(1);
+                document.getElementById('stoneRatio').textContent = stoneRatio.toFixed(2);
+                document.getElementById('stonePercent').textContent = stonePercent.toFixed(1);
+                document.getElementById('waterRatio').textContent = waterRatio.toFixed(2);
+                document.getElementById('waterPercent').textContent = waterPercent.toFixed(1);
+                document.getElementById('admixtureRatio').textContent = admixtureRatio.toFixed(4);
+                document.getElementById('admixturePercent').textContent = admixturePercent.toFixed(1);
+                
+                // 显示性能指标
+                document.getElementById('waterCementRatio').textContent = waterCementRatio.toFixed(2);
+                document.getElementById('sandRatioValue').textContent = sandRatioValue.toFixed(1);
+                document.getElementById('totalWeight').textContent = totalWeight.toFixed(1);
+                
+                // 显示结果
+                resultsDiv.style.display = 'block';
+                
+                // 平滑滚动到结果区域
+                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+            } catch (error) {
+                console.error('计算过程中发生错误:', error);
+                alert('计算过程中发生错误，请检查输入数据');
+            }
+        });
+
+        // 重置按钮事件
+        form.addEventListener('reset', function() {
+            resultsDiv.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
