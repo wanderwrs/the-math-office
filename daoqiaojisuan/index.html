@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>道路工程计算器集合</title>
+    <meta name="description" content="道路工程计算工具集合，支持离线使用">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="manifest" href="manifest.json">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .tab-active {
+                @apply text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400;
+            }
+            .tab-inactive {
+                @apply text-gray-600 dark:text-gray-400 border-b-2 border-transparent;
+            }
+            .card-hover {
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            .card-hover:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen transition-colors duration-300">
+    <!-- 导航栏 -->
+    <nav class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <a href="../index.html" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" title="返回首页">
+                    <i class="fa fa-home text-gray-600 dark:text-gray-300"></i>
+                </a>
+                <i class="fa fa-calculator text-blue-500 text-2xl"></i>
+                <h1 class="text-xl font-bold">道路工程计算器集合</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fa fa-moon-o dark:hidden"></i>
+                    <i class="fa fa-sun-o hidden dark:block"></i>
+                </button>
+                <button id="help-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fa fa-question-circle"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- 选项卡导航 -->
+        <div class="flex overflow-x-auto scrollbar-hide mb-6 border-b border-gray-200 dark:border-gray-700">
+            <button id="tab-home" class="px-4 py-3 text-sm font-medium tab-active whitespace-nowrap" onclick="switchTab('home')">
+                首页
+            </button>
+            <button id="tab-sand" class="px-4 py-3 text-sm font-medium tab-inactive whitespace-nowrap" onclick="switchTab('sand')">
+                砂子堆积密度计算器
+            </button>
+            <a href="needle_shape_calculator.html" class="px-4 py-3 text-sm font-medium tab-inactive whitespace-nowrap">
+                石子针片状计算器
+            </a>
+            <button id="tab-angle" class="px-4 py-3 text-sm font-medium tab-inactive whitespace-nowrap" onclick="switchTab('angle')">
+                角度计算器
+            </button>
+            <button id="tab-water-cement" class="px-4 py-3 text-sm font-medium tab-inactive whitespace-nowrap" onclick="switchTab('water-cement')">
+                水灰比计算器
+            </button>
+            <a href="sand_sieve_analysis_calculator.html" class="px-4 py-3 text-sm font-medium tab-inactive whitespace-nowrap">
+                砂筛分实验计算器
+            </a>
+            <a href="cement_fineness_calculator.html" class="px-4 py-3 text-sm font-medium tab-inactive whitespace-nowrap">
+                水泥细度实验计算器
+            </a>
+            <a href="cement_consistency_calculator.html" class="px-4 py-3 text-sm font-medium tab-inactive whitespace-nowrap">
+                水泥标准稠度用水量计算器
+            </a>
+            <a href="concrete_slump_calculator.html" class="px-4 py-3 text-sm font-medium tab-inactive whitespace-nowrap">
+                混凝土拌合物稠度实验计算器
+            </a>
+            <a href="cement_mortar_strength_calculator.html" class="px-4 py-3 text-sm font-medium tab-inactive whitespace-nowrap">
+                水泥胶砂强度试验计算器
+            </a>
+            <a href="cement_paste_mortar_calculator.html" class="px-4 py-3 text-sm font-medium tab-inactive whitespace-nowrap">灰砂比与道路工程综合计算器</a>
+        </div>
+
+        <!-- 首页内容 -->
+        <div id="home-content" class="tab-pane">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- 砂子堆积密度计算器卡片 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover border border-gray-200 dark:border-gray-700">
+                    <div class="bg-gradient-to-r from-blue-500 to-indigo-400 h-2"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-semibold">砂子堆积密度计算器</h3>
+                            <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 text-xs rounded-full">
+                                松散/密集状态
+                            </span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            计算砂子在松散和密集状态下的堆积密度及孔隙率。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <button class="text-blue-500 text-sm font-medium" onclick="switchTab('sand')">
+                                打开计算器 <i class="fa fa-arrow-right ml-1"></i>
+                            </button>
+                            <div class="flex space-x-2">
+                                <span class="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">实时计算</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 石子针片状计算器卡片 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover border border-gray-200 dark:border-gray-700">
+                    <div class="bg-gradient-to-r from-green-500 to-emerald-400 h-2"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-semibold">石子针片状计算器</h3>
+                            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 text-xs rounded-full">
+                                颗粒含量分析
+                            </span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            计算石子针片状颗粒含量，支持批量样本分析。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <a href="needle_shape_calculator.html" class="text-blue-500 text-sm font-medium">
+                                打开计算器 <i class="fa fa-arrow-right ml-1"></i>
+                            </a>
+                            <div class="flex space-x-2">
+                                <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">批量计算</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 角度计算器卡片 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover border border-gray-200 dark:border-gray-700">
+                    <div class="bg-gradient-to-r from-orange-500 to-amber-400 h-2"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-semibold">角度计算器</h3>
+                            <span class="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 px-2 py-1 text-xs rounded-full">
+                                度分秒加减
+                            </span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            提供角度的度分秒（DMS）格式加减运算功能。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <button class="text-blue-500 text-sm font-medium" onclick="switchTab('angle')">
+                                打开计算器 <i class="fa fa-arrow-right ml-1"></i>
+                            </button>
+                            <div class="flex space-x-2">
+                                <span class="text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-1 rounded">快速计算</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 水灰比计算器卡片 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover border border-gray-200 dark:border-gray-700">
+                    <div class="bg-gradient-to-r from-cyan-500 to-blue-400 h-2"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-semibold">水灰比计算器</h3>
+                            <span class="bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200 px-2 py-1 text-xs rounded-full">
+                                配合比设计
+                            </span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            计算混凝土水灰比及配合比参数。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <button class="text-blue-500 text-sm font-medium" onclick="switchTab('water-cement')">
+                                打开计算器 <i class="fa fa-arrow-right ml-1"></i>
+                            </button>
+                            <div class="flex space-x-2">
+                                <span class="text-xs bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200 px-2 py-1 rounded">双模式</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 水泥标准稠度用水量计算器卡片 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover border border-gray-200 dark:border-gray-700">
+                    <div class="bg-gradient-to-r from-amber-500 to-yellow-400 h-2"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-semibold">水泥标准稠度用水量计算器</h3>
+                            <span class="bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-2 py-1 text-xs rounded-full">
+                                用水量测定
+                            </span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            计算水泥标准稠度用水量百分比，判断水泥净浆稠度状态。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <a href="cement_consistency_calculator.html" class="text-blue-500 text-sm font-medium">
+                                打开计算器 <i class="fa fa-arrow-right ml-1"></i>
+                            </a>
+                            <div class="flex space-x-2">
+                                <span class="text-xs bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-2 py-1 rounded">快速计算</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 砂筛分实验计算器卡片 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover border border-gray-200 dark:border-gray-700">
+                    <div class="bg-gradient-to-r from-teal-500 to-cyan-400 h-2"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-semibold">砂筛分实验计算器</h3>
+                            <span class="bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200 px-2 py-1 text-xs rounded-full">
+                                颗粒分析
+                            </span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            计算砂筛分实验的分计筛余百分率和累计筛余百分率，评定砂的颗粒级配。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <a href="sand_sieve_analysis_calculator.html" class="text-blue-500 text-sm font-medium">
+                                打开计算器 <i class="fa fa-arrow-right ml-1"></i>
+                            </a>
+                            <div class="flex space-x-2">
+                                <span class="text-xs bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200 px-2 py-1 rounded">智能计算</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 水泥胶砂强度试验计算器卡片 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover border border-gray-200 dark:border-gray-700">
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-400 h-2"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-semibold">水泥胶砂强度试验计算器</h3>
+                            <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-1 text-xs rounded-full">
+                                强度试验
+                            </span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                            计算水泥胶砂抗折和抗压强度试验结果，支持多个试验数据的平均值计算。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <a href="cement_mortar_strength_calculator.html" class="text-blue-500 text-sm font-medium">
+                                打开计算器 <i class="fa fa-arrow-right ml-1"></i>
+                            </a>
+                            <div class="flex space-x-2">
+                                <span class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-1 rounded">智能计算</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 功能特点介绍 -->
+            <div class="mt-10 bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+                <h2 class="text-xl font-bold mb-4 text-center">功能特点</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-4">
+                            <i class="fa fa-mobile text-2xl text-blue-500"></i>
+                        </div>
+                        <h3 class="font-medium mb-2">响应式设计</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">自适应各种屏幕尺寸</p>
+                    </div>
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mb-4">
+                            <i class="fa fa-moon-o text-2xl text-green-500"></i>
+                        </div>
+                        <h3 class="font-medium mb-2">深色模式</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">支持浅色/深色主题切换</p>
+                    </div>
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mb-4">
+                            <i class="fa fa-line-chart text-2xl text-purple-500"></i>
+                        </div>
+                        <h3 class="font-medium mb-2">数据可视化</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">直观图表展示计算结果</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 项目设计与技术信息 -->
+            <div class="mt-10 bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+                <h2 class="text-xl font-bold mb-2 text-center">项目设计与技术信息</h2>
+                <p class="text-center text-sm text-gray-500 dark:text-gray-400 mb-6">设计原理、公开架构、引用来源与参考资料</p>
+
+                <div class="space-y-4">
+                    <!-- AI 设计原理 -->
+                    <details class="group border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden" open>
+                        <summary class="flex items-center justify-between px-5 py-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors list-none">
+                            <span class="font-medium flex items-center">
+                                <i class="fa fa-robot text-blue-500 mr-2"></i> AI 设计原理
+                            </span>
+                            <i class="fa fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                            <p>本工具集合由 TRAE AI 编程助手辅助设计开发，遵循以下设计原则：</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>本地优先：所有页面为纯静态资源，可完全离线运行，数据不上传任何服务器</li>
+                                <li>学习导向：面向道路工程实验教学与现场快速计算场景，非盈利、仅供学习使用</li>
+                                <li>AI 辅助开发：由 AI 完成需求分析、界面设计、计算公式编码、样式统一与离线能力集成</li>
+                                <li>渐进增强：核心计算功能无需网络即可使用，PWA 能力在支持的环境中自动增强体验</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <!-- 架构公开 -->
+                    <details class="group border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                        <summary class="flex items-center justify-between px-5 py-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors list-none">
+                            <span class="font-medium flex items-center">
+                                <i class="fa fa-sitemap text-emerald-500 mr-2"></i> 架构公开
+                            </span>
+                            <i class="fa fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 space-y-3">
+                            <div>
+                                <p class="font-medium text-gray-800 dark:text-gray-200 mb-1">技术架构</p>
+                                <p>纯前端静态架构（HTML + CSS + JavaScript），无后端服务依赖，浏览器直接运行。</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800 dark:text-gray-200 mb-1">目录结构</p>
+                                <pre class="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-xs overflow-x-auto leading-relaxed">the MATH office/
+├── index.html                    集合主页（门户入口）
+└── daoqiaojisuan/                道路工程计算器集合
+    ├── index.html                计算器集合主页（选项卡式）
+    ├── common.css                统一公共样式（主题/导航/组件）
+    ├── manifest.json             PWA 应用清单
+    ├── service-worker.js         离线缓存 Service Worker
+    └── *_calculator.html         10 个独立计算器页面</pre>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800 dark:text-gray-200 mb-1">技术栈</p>
+                                <p>Tailwind CSS（UI 样式）、Font Awesome 4.7（图标）、Chart.js（图表可视化）、原生 JavaScript（计算逻辑）、Service Worker（PWA 离线）。</p>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- 引用来源 -->
+                    <details class="group border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                        <summary class="flex items-center justify-between px-5 py-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors list-none">
+                            <span class="font-medium flex items-center">
+                                <i class="fa fa-book text-amber-500 mr-2"></i> 引用来源
+                            </span>
+                            <i class="fa fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                            <p>本工具引用的开源库与在线资源：</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>Tailwind CSS - 实用优先的 CSS 框架：<a href="https://tailwindcss.com" target="_blank" rel="noopener" class="text-blue-500 hover:underline">https://tailwindcss.com</a></li>
+                                <li>Font Awesome 4.7 - 图标字体库：<a href="https://fontawesome.com/v4/" target="_blank" rel="noopener" class="text-blue-500 hover:underline">https://fontawesome.com/v4/</a></li>
+                                <li>Chart.js - 开源图表库：<a href="https://www.chartjs.org" target="_blank" rel="noopener" class="text-blue-500 hover:underline">https://www.chartjs.org</a></li>
+                                <li>MDN Web Docs - Service Worker 离线技术文档：<a href="https://developer.mozilla.org/docs/Web/API/Service_Worker_API" target="_blank" rel="noopener" class="text-blue-500 hover:underline">https://developer.mozilla.org/docs/Web/API/Service_Worker_API</a></li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <!-- 参考资料 -->
+                    <details class="group border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                        <summary class="flex items-center justify-between px-5 py-4 bg-gray-50 dark:bg-gray-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors list-none">
+                            <span class="font-medium flex items-center">
+                                <i class="fa fa-graduation-cap text-purple-500 mr-2"></i> 参考资料
+                            </span>
+                            <i class="fa fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                            <p>各计算器对应的道路工程实验方法与规范（依据公开的试验方法整理）：</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>水泥细度检验方法（筛析法，80μm / 45μm 方孔筛）</li>
+                                <li>水泥标准稠度用水量、凝结时间、安定性检验方法</li>
+                                <li>水泥胶砂强度检验方法（抗折、抗压强度试验）</li>
+                                <li>混凝土拌合物稠度试验方法（坍落度法）</li>
+                                <li>砂子堆积密度与孔隙率试验、砂筛分试验</li>
+                                <li>石子针片状颗粒含量试验</li>
+                                <li>混凝土配合比设计（水灰比、灰砂比参数）</li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+
+        <!-- 砂子堆积密度计算器内容 -->
+        <div id="sand-content" class="tab-pane hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold mb-6 text-center">砂子堆积密度计算器</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">计算参数</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">容量桶容积 (L)</label>
+                                <input type="number" id="container-volume" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="请输入容量桶容积">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">桶+砂子质量m1 (kg)</label>
+                                <input type="number" id="mass-m1" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="请输入桶+砂子质量">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">空桶质量m2 (kg)</label>
+                                <input type="number" id="mass-m2" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="请输入空桶质量">
+                            </div>
+                            <button id="sand-calculate-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg w-full">
+                                计算
+                            </button>
+                            <button id="sand-reset-btn" class="border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium py-2 px-4 rounded-lg w-full">
+                                重置
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">计算结果</h3>
+                        <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg space-y-4">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">砂子表观密度 (kg/m³)</p>
+                                <p id="sand-apparent-density-result" class="text-lg font-medium">--</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">砂子堆积密度ρ1 (kg/m³)</p>
+                                <p id="sand-bulk-density" class="text-lg font-medium">--</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">砂子质量 (kg)</p>
+                                <p id="sand-mass" class="text-lg font-medium">--</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">孔隙率 (%)</p>
+                                <p id="sand-porosity" class="text-lg font-medium">--</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">空隙体积 (L)</p>
+                                <p id="void-volume" class="text-lg font-medium">--</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 石子针片状计算器内容 -->
+        <div id="needle-content" class="tab-pane hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold mb-6 text-center">石子针片状计算器</h2>
+                <div class="py-10 text-center">
+                    <i class="fa fa-random text-3xl text-green-500 mb-4"></i>
+                    <p>石子针片状计算器功能已加载</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 角度计算器内容 -->
+        <div id="angle-content" class="tab-pane hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold mb-6 text-center">度分秒计算器</h2>
+                
+                <div class="space-y-6">
+                    <!-- 第一个角度输入 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">角度 1</label>
+                        <div class="flex space-x-2">
+                            <input type="number" id="angle1-degree" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="度">
+                            <input type="number" id="angle1-minute" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="分" min="0" max="59">
+                            <input type="number" id="angle1-second" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="秒" min="0" max="59">
+                        </div>
+                    </div>
+                    
+                    <!-- 运算符号选择 -->
+                    <div class="flex justify-center">
+                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                            <button type="button" id="btn-add" class="py-2 px-4 text-sm font-medium text-white bg-blue-700 rounded-l-lg hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                +
+                            </button>
+                            <button type="button" id="btn-subtract" class="py-2 px-4 text-sm font-medium text-white bg-blue-500 rounded-r-lg hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                -
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 第二个角度输入 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">角度 2</label>
+                        <div class="flex space-x-2">
+                            <input type="number" id="angle2-degree" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="度">
+                            <input type="number" id="angle2-minute" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="分" min="0" max="59">
+                            <input type="number" id="angle2-second" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="秒" min="0" max="59">
+                        </div>
+                    </div>
+                    
+                    <!-- 计算和重置按钮 -->
+                    <div class="flex space-x-4">
+                        <button id="angle-calculate-btn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center">
+                            <i class="fa fa-calculator mr-2"></i> 计算
+                        </button>
+                        <button id="angle-reset-btn" class="flex-1 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium py-2 px-4 rounded-lg flex items-center justify-center">
+                            <i class="fa fa-refresh mr-2"></i> 重置
+                        </button>
+                    </div>
+                    
+                    <!-- 结果显示 -->
+                    <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">计算结果</h3>
+                        <p id="result-dms" class="text-xl font-bold">--</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 水灰比计算器内容 -->
+        <div id="water-cement-content" class="tab-pane hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold mb-6 text-center">水灰比计算器</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">计算参数</h3>
+                        <div class="space-y-4">
+                            <!-- 新增参数 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">骨料类型</label>
+                                <select id="aggregate-type" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg">
+                                    <option value="碎石">碎石</option>
+                                    <option value="卵石">卵石</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">回归系数 A</label>
+                                <input type="number" id="regression-coef-a" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" value="0.46" step="0.01" min="0.4" max="0.6">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">回归系数 B</label>
+                                <input type="number" id="regression-coef-b" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" value="0.52" step="0.01" min="0.4" max="0.6">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">混凝土配置强度 (MPa)</label>
+                                <input type="number" id="concrete-target-strength" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="请输入配置强度">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">水泥实际抗压强度 (MPa)</label>
+                                <input type="number" id="cement-compressive-strength" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="请输入水泥抗压强度">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">水的质量 (kg)</label>
+                                <input type="number" id="water-mass" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="请输入水的质量">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">水泥的质量 (kg)</label>
+                                <input type="number" id="cement-mass" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="请输入水泥的质量">
+                            </div>
+                            <button id="water-cement-calculate-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg w-full">
+                                计算
+                            </button>
+                            <button id="water-cement-reset-btn" class="border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium py-2 px-4 rounded-lg w-full">
+                                重置
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">计算结果</h3>
+                        <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg space-y-4">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">水灰比 (W/C)</p>
+                                <p id="water-cement-ratio" class="text-lg font-medium">--</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">由强度计算的最大水灰比</p>
+                                <p id="max-water-cement-ratio" class="text-lg font-medium">--</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">水泥浆体积 (L)</p>
+                                <p id="paste-volume" class="text-lg font-medium">--</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">水泥浆相对密度</p>
+                                <p id="paste-density" class="text-lg font-medium">--</p>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">配置强度验证结果</p>
+                                <p id="strength-verification" class="text-lg font-medium">--</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 水泥胶砂强度试验计算器内容 -->
+        <div id="cement-mortar-content" class="tab-pane hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover border border-gray-200 dark:border-gray-700">
+                <div class="bg-gradient-to-r from-purple-500 to-pink-400 h-2"></div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-lg font-semibold">水泥胶砂强度试验计算器</h3>
+                        <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-1 text-xs rounded-full">
+                            强度试验
+                        </span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                            <h4 class="font-medium mb-3 text-gray-700 dark:text-gray-300">抗折实验</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">极限载荷 (kN)</label>
+                                    <input type="number" id="flexural-load" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="请输入极限载荷">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">抗折强度 (MPa)</label>
+                                    <input type="number" id="flexural-strength" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="请输入抗折强度">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                            <h4 class="font-medium mb-3 text-gray-700 dark:text-gray-300">抗压实验</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">极限载荷 (kN)</label>
+                                    <input type="number" id="compressive-load" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="请输入极限载荷">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">抗压强度 (MPa)</label>
+                                    <input type="number" id="compressive-strength" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="请输入抗压强度">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button id="cement-mortar-calculate-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg w-full">
+                            计算
+                        </button>
+                        <button id="cement-mortar-reset-btn" class="border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium py-2 px-4 rounded-lg w-full">
+                            重置
+                        </button>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">计算结果</h3>
+                        <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg space-y-4">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">抗折实验平均 MPa</p>
+                                <p id="flexural-avg-mpa" class="text-lg font-medium">--</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">抗压试验 MPa</p>
+                                <p id="compressive-mpa" class="text-lg font-medium">--</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">计算状态</p>
+                                <p id="calculation-status" class="text-lg font-medium">--</p>
+                            </div>
+                            <div class="pt-2">
+                                <h4 class="font-medium mb-2 text-gray-700 dark:text-gray-300">计算公式</h4>
+                                <div class="space-y-2">
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">抗折强度 = 3F/(2bh²) MPa</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">抗压强度 = F/A MPa</p>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-2">注：F为极限载荷(N)，b和h为试体截面尺寸(mm)，A为受压面积(mm²)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-6 mt-10">
+        <div class="container mx-auto px-4 text-center text-gray-600 dark:text-gray-400 text-sm">
+            <p>© 2023 道路工程计算器集合</p>
+        </div>
+    </footer>
+
+    <!-- 帮助模态框 -->
+    <div id="help-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] overflow-y-auto" style="animation: fadeIn 0.3s ease-in-out;">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h2 class="text-xl font-bold">使用帮助</h2>
+                <button id="close-help" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2">计算器集合说明</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        本系统集成了四个专业的道路工程计算工具，可通过顶部选项卡进行切换使用。
+                    </p>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2">度分秒计算器</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-2">
+                        用于执行两个角度的度分秒（DMS）格式的加减运算。
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        使用方法：
+                    </p>
+                    <ul class="text-sm text-gray-500 dark:text-gray-400 list-disc pl-5 mb-2">
+                        <li>在角度1和角度2的度分秒输入框中分别输入要计算的角度值</li>
+                        <li>选择要执行的运算（加法或减法）</li>
+                        <li>点击"计算"按钮，结果将以度分秒格式显示</li>
+                        <li>点击"重置"按钮可以清空所有输入并重置运算选择</li>
+                    </ul>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        注意：分和秒的值必须在0到59之间，否则会提示输入错误。
+                    </p>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2">砂子堆积密度计算器</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-2">
+                        通过测量容量桶容积、桶+砂子质量(m1)和空桶质量(m2)来计算砂子的堆积密度。
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        计算公式：堆积密度ρ1 = (m1 - m2) / (容量桶容积/1000)
+                    </p>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2">水灰比计算器</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-2">
+                        计算混凝土水灰比及相关参数，支持不同骨料类型、混凝土配置强度和水泥抗压强度的计算。
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        使用方法：
+                    </p>
+                    <ul class="text-sm text-gray-500 dark:text-gray-400 list-disc pl-5 mb-2">
+                        <li>选择骨料类型（碎石或卵石），系统会自动设置相应的回归系数默认值</li>
+                        <li>输入或调整回归系数A和B的值</li>
+                        <li>输入混凝土配置强度(MPa)和水泥实际抗压强度(MPa)</li>
+                        <li>输入水的质量(kg)和水泥的质量(kg)</li>
+                        <li>点击"计算"按钮获取计算结果</li>
+                    </ul>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        计算公式：
+                    </p>
+                    <ul class="text-sm text-gray-500 dark:text-gray-400 list-disc pl-5">
+                        <li>水灰比(W/C) = 水的质量 / 水泥的质量</li>
+                        <li>最大水灰比 = 1 / [(fcu/(A*fce)) + B]，其中fcu为混凝土配置强度，fce为水泥抗压强度，A和B为回归系数</li>
+                        <li>水泥浆体积 = (水的质量/水密度 + 水泥质量/水泥密度) × 1000，水密度取1000kg/m³，水泥密度取3100kg/m³</li>
+                        <li>水泥浆相对密度 = 总质量/总体积 ÷ 1000</li>
+                    </ul>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2">水泥胶砂强度试验计算器</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-2">
+                        计算水泥胶砂抗折和抗压强度试验结果，支持直接输入强度值或通过极限载荷计算强度值。
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        使用方法：
+                    </p>
+                    <ul class="text-sm text-gray-500 dark:text-gray-400 list-disc pl-5 mb-2">
+                        <li>在抗折实验部分，输入极限载荷(kN)或抗折强度值(MPa)，两者至少输入一项</li>
+                        <li>在抗压实验部分，输入极限载荷(kN)或抗压强度值(MPa)，两者至少输入一项</li>
+                        <li>点击"计算"按钮获取计算结果</li>
+                        <li>点击"重置"按钮清空所有输入和结果</li>
+                    </ul>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        计算公式：
+                    </p>
+                    <ul class="text-sm text-gray-500 dark:text-gray-400 list-disc pl-5">
+                        <li>抗折强度 = 3F/(2bh²) MPa，其中F为极限载荷(N)，b和h为试体截面尺寸(mm)，本计算器假设标准试体尺寸为40mm×40mm×160mm，支撑跨度100mm</li>
+                        <li>抗压强度 = F/A MPa，其中F为极限载荷(N)，A为受压面积(mm²)，本计算器假设受压面积为40mm×40mm</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 功能实现 -->
+    <script>
+        // 选项卡切换
+        function switchTab(tabId) {
+            const panes = document.querySelectorAll('.tab-pane');
+            panes.forEach(pane => {
+                pane.classList.add('hidden');
+            });
+            
+            const tabs = document.querySelectorAll('[id^="tab-"]');
+            tabs.forEach(tab => {
+                tab.classList.remove('tab-active');
+                tab.classList.add('tab-inactive');
+            });
+            
+            const activeTab = document.getElementById('tab-' + tabId);
+            if (activeTab) {
+                activeTab.classList.remove('tab-inactive');
+                activeTab.classList.add('tab-active');
+            }
+            
+            const activeContent = document.getElementById(tabId + '-content');
+            if (activeContent) {
+                activeContent.classList.remove('hidden');
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 主题切换功能
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    document.documentElement.classList.toggle('dark');
+                    const isDark = document.documentElement.classList.contains('dark');
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                });
+            }
+            
+            // 检查主题设置
+            if (localStorage.getItem('theme') === 'dark' || 
+                    (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+            
+            // 帮助模态框
+            const helpBtn = document.getElementById('help-btn');
+            const helpModal = document.getElementById('help-modal');
+            const closeHelp = document.getElementById('close-help');
+            
+            if (helpBtn && helpModal && closeHelp) {
+                helpBtn.addEventListener('click', function() {
+                    helpModal.classList.remove('hidden');
+                });
+                
+                closeHelp.addEventListener('click', function() {
+                    helpModal.classList.add('hidden');
+                });
+                
+                helpModal.addEventListener('click', function(e) {
+                    if (e.target === helpModal) {
+                        helpModal.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // 初始化度分秒计算器
+            initDMSCalculator();
+            initWaterCementRatioCalculator();
+            initCementMortarCalculator();
+        });
+        
+        // 水泥胶砂强度试验计算器初始化
+        function initCementMortarCalculator() {
+            // 计算按钮点击事件
+            const calculateBtn = document.getElementById('cement-mortar-calculate-btn');
+            const resetBtn = document.getElementById('cement-mortar-reset-btn');
+            
+            if (calculateBtn && resetBtn) {
+                calculateBtn.addEventListener('click', function() {
+                    // 获取输入值
+                    const flexuralLoad = parseFloat(document.getElementById('flexural-load').value) || 0;
+                    const flexuralStrength = parseFloat(document.getElementById('flexural-strength').value) || 0;
+                    const compressiveLoad = parseFloat(document.getElementById('compressive-load').value) || 0;
+                    const compressiveStrength = parseFloat(document.getElementById('compressive-strength').value) || 0;
+                    
+                    // 初始化结果元素
+                    const flexuralAvgMpaElem = document.getElementById('flexural-avg-mpa');
+                    const compressiveMpaElem = document.getElementById('compressive-mpa');
+                    const calculationStatusElem = document.getElementById('calculation-status');
+                    
+                    // 输入验证
+                    if (!validateInputs(flexuralLoad, flexuralStrength, compressiveLoad, compressiveStrength)) {
+                        return;
+                    }
+                    
+                    // 计算抗折实验平均MPa
+                    // 对于抗折强度，使用直接输入的强度值作为平均值
+                    const flexuralAvgMpa = flexuralStrength > 0 ? flexuralStrength : (flexuralLoad > 0 ? calculateFlexuralStrength(flexuralLoad) : 0);
+                    
+                    // 计算抗压试验MPa
+                    // 对于抗压强度，使用直接输入的强度值或基于极限载荷计算
+                    const compressiveMpa = compressiveStrength > 0 ? compressiveStrength : (compressiveLoad > 0 ? calculateCompressiveStrength(compressiveLoad) : 0);
+                    
+                    // 更新计算状态
+                    let status = '计算完成';
+                    if (flexuralLoad === 0 && flexuralStrength === 0) {
+                        status += ' - 缺少抗折实验数据';
+                    }
+                    if (compressiveLoad === 0 && compressiveStrength === 0) {
+                        status += ' - 缺少抗压实验数据';
+                    }
+                    
+                    // 显示结果
+                    if (flexuralAvgMpa > 0) {
+                        flexuralAvgMpaElem.textContent = flexuralAvgMpa.toFixed(2) + ' MPa';
+                    } else {
+                        flexuralAvgMpaElem.textContent = '--';
+                    }
+                    
+                    if (compressiveMpa > 0) {
+                        compressiveMpaElem.textContent = compressiveMpa.toFixed(2) + ' MPa';
+                    } else {
+                        compressiveMpaElem.textContent = '--';
+                    }
+                    
+                    calculationStatusElem.textContent = status;
+                });
+                
+                // 重置按钮点击事件
+                resetBtn.addEventListener('click', function() {
+                    // 清空所有输入
+                    document.getElementById('flexural-load').value = '';
+                    document.getElementById('flexural-strength').value = '';
+                    document.getElementById('compressive-load').value = '';
+                    document.getElementById('compressive-strength').value = '';
+                    
+                    // 重置所有结果
+                    document.getElementById('flexural-avg-mpa').textContent = '--';
+                    document.getElementById('compressive-mpa').textContent = '--';
+                    document.getElementById('calculation-status').textContent = '--';
+                });
+            }
+            
+            // 输入验证函数
+            function validateInputs(flexuralLoad, flexuralStrength, compressiveLoad, compressiveStrength) {
+                // 检查是否提供了至少一组数据
+                if (flexuralLoad === 0 && flexuralStrength === 0 && compressiveLoad === 0 && compressiveStrength === 0) {
+                    alert('请至少输入一项抗折或抗压实验数据');
+                    return false;
+                }
+                
+                // 检查数值是否为负数
+                if (flexuralLoad < 0 || flexuralStrength < 0 || compressiveLoad < 0 || compressiveStrength < 0) {
+                    alert('输入值不能为负数');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            // 计算抗折强度 (MPa)
+            // 公式: 抗折强度 = 3F/(2bh²) MPa
+            // 假设标准试体尺寸: 40mm×40mm×160mm，支撑跨度100mm
+            function calculateFlexuralStrength(load) {
+                const b = 40; // mm
+                const h = 40; // mm
+                const l = 100; // mm，支撑跨度
+                
+                // 将kN转换为N进行计算
+                const loadN = load * 1000;
+                
+                // 计算抗折强度 MPa = N/mm²
+                const strength = (3 * loadN * l) / (2 * b * Math.pow(h, 2));
+                
+                return strength;
+            }
+            
+            // 计算抗压强度 (MPa)
+            // 公式: 抗压强度 = F/A MPa
+            // 假设受压面积为40mm×40mm
+            function calculateCompressiveStrength(load) {
+                const A = 40 * 40; // mm²，受压面积
+                
+                // 将kN转换为N进行计算
+                const loadN = load * 1000;
+                
+                // 计算抗压强度 MPa = N/mm²
+                const strength = loadN / A;
+                
+                return strength;
+            }
+        }
+        
+        // 度分秒计算器初始化
+        function initDMSCalculator() {
+            // 初始化运算符号为加法
+            let operationType = 'add';
+            
+            // 运算符号按钮点击事件
+            const btnAdd = document.getElementById('btn-add');
+            const btnSubtract = document.getElementById('btn-subtract');
+            
+            if (btnAdd && btnSubtract) {
+                btnAdd.addEventListener('click', function() {
+                    operationType = 'add';
+                    btnAdd.classList.add('bg-blue-700');
+                    btnAdd.classList.remove('bg-blue-500');
+                    btnSubtract.classList.remove('bg-blue-700');
+                    btnSubtract.classList.add('bg-blue-500');
+                });
+                
+                btnSubtract.addEventListener('click', function() {
+                    operationType = 'subtract';
+                    btnSubtract.classList.add('bg-blue-700');
+                    btnSubtract.classList.remove('bg-blue-500');
+                    btnAdd.classList.remove('bg-blue-700');
+                    btnAdd.classList.add('bg-blue-500');
+                });
+            }
+            
+            // 计算按钮点击事件
+            const calculateBtn = document.getElementById('angle-calculate-btn');
+            if (calculateBtn) {
+                calculateBtn.addEventListener('click', function() {
+                    // 获取第一个角度的度分秒
+                    const deg1 = parseFloat(document.getElementById('angle1-degree').value) || 0;
+                    const min1 = parseFloat(document.getElementById('angle1-minute').value) || 0;
+                    const sec1 = parseFloat(document.getElementById('angle1-second').value) || 0;
+                    
+                    // 获取第二个角度的度分秒
+                    const deg2 = parseFloat(document.getElementById('angle2-degree').value) || 0;
+                    const min2 = parseFloat(document.getElementById('angle2-minute').value) || 0;
+                    const sec2 = parseFloat(document.getElementById('angle2-second').value) || 0;
+                    
+                    // 验证输入
+                    if (min1 < 0 || min1 >= 60 || sec1 < 0 || sec1 >= 60 || 
+                        min2 < 0 || min2 >= 60 || sec2 < 0 || sec2 >= 60) {
+                        alert('分和秒的值必须在0到59之间');
+                        return;
+                    }
+                    
+                    // 计算结果
+                    const result = calculateDMS(deg1, min1, sec1, deg2, min2, sec2, operationType);
+                    
+                    // 显示结果
+                    document.getElementById('result-dms').textContent = result;
+                });
+            }
+            
+            // 重置按钮点击事件
+            const resetBtn = document.getElementById('angle-reset-btn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    document.getElementById('angle1-degree').value = '';
+                    document.getElementById('angle1-minute').value = '';
+                    document.getElementById('angle1-second').value = '';
+                    document.getElementById('angle2-degree').value = '';
+                    document.getElementById('angle2-minute').value = '';
+                    document.getElementById('angle2-second').value = '';
+                    document.getElementById('result-dms').textContent = '--';
+                    
+                    // 重置运算符号为加法
+                    operationType = 'add';
+                    if (btnAdd && btnSubtract) {
+                        btnAdd.classList.add('bg-blue-700');
+                        btnAdd.classList.remove('bg-blue-500');
+                        btnSubtract.classList.remove('bg-blue-700');
+                        btnSubtract.classList.add('bg-blue-500');
+                    }
+                });
+            }
+        }
+        
+        // 度分秒计算函数
+        function calculateDMS(deg1, min1, sec1, deg2, min2, sec2, operation) {
+            // 将度分秒转换为总秒数进行计算
+            let totalSeconds1 = deg1 * 3600 + min1 * 60 + sec1;
+            let totalSeconds2 = deg2 * 3600 + min2 * 60 + sec2;
+            
+            // 执行加减运算
+            let resultSeconds;
+            if (operation === 'add') {
+                resultSeconds = totalSeconds1 + totalSeconds2;
+            } else {
+                resultSeconds = totalSeconds1 - totalSeconds2;
+            }
+            
+            // 处理负角度情况
+            const isNegative = resultSeconds < 0;
+            if (isNegative) {
+                resultSeconds = Math.abs(resultSeconds);
+            }
+            
+            // 将总秒数转换回度分秒
+            let resultDeg = Math.floor(resultSeconds / 3600);
+            let remainingSeconds = resultSeconds % 3600;
+            let resultMin = Math.floor(remainingSeconds / 60);
+            let resultSec = (remainingSeconds % 60).toFixed(2);
+            
+            // 格式化输出结果
+            const sign = isNegative ? '-' : '';
+            return `${sign}${resultDeg}° ${resultMin}' ${resultSec}"`;
+        }
+        
+        // 水灰比计算器初始化
+        function initWaterCementRatioCalculator() {
+            // 骨料类型选择影响回归系数默认值
+            const aggregateTypeSelect = document.getElementById('aggregate-type');
+            if (aggregateTypeSelect) {
+                aggregateTypeSelect.addEventListener('change', function() {
+                    // 根据骨料类型设置默认回归系数
+                    if (this.value === '碎石') {
+                        document.getElementById('regression-coef-a').value = '0.46';
+                        document.getElementById('regression-coef-b').value = '0.07';
+                    } else {
+                        document.getElementById('regression-coef-a').value = '0.48';
+                        document.getElementById('regression-coef-b').value = '0.33';
+                    }
+                });
+            }
+            
+            // 计算按钮点击事件
+            const calculateBtn = document.getElementById('water-cement-calculate-btn');
+            if (calculateBtn) {
+                calculateBtn.addEventListener('click', function() {
+                    // 获取输入值
+                    const aggregateType = document.getElementById('aggregate-type').value;
+                    const regressionCoefA = parseFloat(document.getElementById('regression-coef-a').value) || 0;
+                    const regressionCoefB = parseFloat(document.getElementById('regression-coef-b').value) || 0;
+                    const concreteTargetStrength = parseFloat(document.getElementById('concrete-target-strength').value) || 0;
+                    const cementCompressiveStrength = parseFloat(document.getElementById('cement-compressive-strength').value) || 0;
+                    const waterMass = parseFloat(document.getElementById('water-mass').value) || 0;
+                    const cementMass = parseFloat(document.getElementById('cement-mass').value) || 0;
+                    
+                    // 基本验证 - 至少需要水和水泥质量才能计算基础水灰比
+                    if (waterMass <= 0 || cementMass <= 0) {
+                        alert('水和水泥的质量必须大于0');
+                        return;
+                    }
+                    
+                    // 计算基本水灰比 (W/C) - 使用正确的公式
+                    const waterCementRatio = waterMass / cementMass;
+                    
+                    // 初始化其他结果
+                    let maxWaterCementRatio = '--';
+                    let strengthVerification = '--';
+                    
+                    // 如果提供了强度参数，则计算最大水灰比和强度验证
+                    if (concreteTargetStrength > 0 && cementCompressiveStrength > 0 && regressionCoefA > 0) {
+                        // 使用Bolomey公式计算最大水灰比: fcu = A * fce * (C/W - B)
+                        // 推导出: W/C = 1 / [(fcu/(A*fce)) + B]
+                        maxWaterCementRatio = 1 / ((concreteTargetStrength / (regressionCoefA * cementCompressiveStrength)) + regressionCoefB);
+                        
+                        // 强度验证结果
+                        if (waterCementRatio <= maxWaterCementRatio) {
+                            strengthVerification = '✓ 满足强度要求';
+                        } else {
+                            strengthVerification = '✗ 不满足强度要求';
+                        }
+                    }
+                    
+                    // 正确计算水泥浆体积 (假设水密度=1000kg/m³，水泥密度=3100kg/m³)
+                    const waterDensity = 1000; // kg/m³
+                    const cementDensity = 3100; // kg/m³
+                    const waterVolume = waterMass / waterDensity; // m³
+                    const cementVolume = cementMass / cementDensity; // m³
+                    const pasteVolume = (waterVolume + cementVolume) * 1000; // 转换为升(L)
+                    
+                    // 正确计算相对密度 (总质量/总体积)
+                    const pasteDensity = (waterMass + cementMass) / (waterVolume + cementVolume) / 1000; // 除以1000得到相对密度(相对于水)
+                    
+                    // 显示结果
+                    document.getElementById('water-cement-ratio').textContent = waterCementRatio.toFixed(3);
+                    
+                    if (maxWaterCementRatio !== '--') {
+                        document.getElementById('max-water-cement-ratio').textContent = maxWaterCementRatio.toFixed(3);
+                    } else {
+                        document.getElementById('max-water-cement-ratio').textContent = maxWaterCementRatio;
+                    }
+                    
+                    document.getElementById('paste-volume').textContent = pasteVolume.toFixed(2);
+                    document.getElementById('paste-density').textContent = pasteDensity.toFixed(2);
+                    document.getElementById('strength-verification').textContent = strengthVerification;
+                });
+            }
+            
+            // 重置按钮点击事件
+            const resetBtn = document.getElementById('water-cement-reset-btn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    // 重置所有输入
+                    document.getElementById('aggregate-type').value = '碎石';
+                    document.getElementById('regression-coef-a').value = '0.46';
+                    document.getElementById('regression-coef-b').value = '0.07';
+                    document.getElementById('concrete-target-strength').value = '';
+                    document.getElementById('cement-compressive-strength').value = '';
+                    document.getElementById('water-mass').value = '';
+                    document.getElementById('cement-mass').value = '';
+                    
+                    // 重置所有结果
+                    document.getElementById('water-cement-ratio').textContent = '--';
+                    document.getElementById('max-water-cement-ratio').textContent = '--';
+                    document.getElementById('paste-volume').textContent = '--';
+                    document.getElementById('paste-density').textContent = '--';
+                    document.getElementById('strength-verification').textContent = '--';
+                });
+            }
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(function(reg) { console.log('Service Worker 已注册', reg.scope); })
+                    .catch(function(err) { console.log('Service Worker 注册失败', err); });
+            });
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
