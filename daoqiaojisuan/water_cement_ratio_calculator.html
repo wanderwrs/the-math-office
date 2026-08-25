@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>水灰比计算器</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#6b7280',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+  <!-- 统一样式 -->
+  <link rel="stylesheet" href="common.css">
+</head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="container navbar-content">
+      <a href="index.html" class="navbar-brand">🧮 道路工程计算器</a>
+      <div class="navbar-actions">
+        <a href="index.html" class="btn-home">🏠 返回首页</a>
+        <button id="theme-toggle" class="btn-theme" title="切换主题">🌙</button>
+      </div>
+    </div>
+  </nav>
+  <!-- 主内容区域 -->
+  <div class="container mx-auto px-4 py-8">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+      <h2 class="text-xl font-bold mb-6 text-center">水灰比计算器</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- 左侧：输入区域 -->
+        <div>
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center">
+              <i class="fa fa-sliders text-primary mr-2"></i> 基本参数
+            </h3>
+            
+            <div class="space-y-4">
+              <!-- 水的用量 -->
+              <div>
+                <label for="water-content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">水的用量 (kg/m³)</label>
+                <input type="number" id="water-content" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white" placeholder="请输入水的用量" min="0" step="0.01">
+              </div>
+              
+              <!-- 水泥的用量 -->
+              <div>
+                <label for="cement-content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">水泥的用量 (kg/m³)</label>
+                <input type="number" id="cement-content" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white" placeholder="请输入水泥的用量" min="0" step="0.01">
+              </div>
+              
+              <!-- 选择计算方式 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">计算方式</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <button id="calc-by-ratio" class="py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">水灰比计算</button>
+                  <button id="calc-by-content" class="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">配合比计算</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 配合比计算区域 -->
+          <div id="mix-design-section" class="mb-6 hidden">
+            <h3 class="text-lg font-semibold mb-4 flex items-center">
+              <i class="fa fa-cogs text-secondary mr-2"></i> 配合比计算
+            </h3>
+            
+            <div class="space-y-4">
+              <!-- 目标水灰比 -->
+              <div>
+                <label for="target-water-cement-ratio" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">目标水灰比 (W/C)</label>
+                <input type="number" id="target-water-cement-ratio" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white" placeholder="请输入目标水灰比" min="0" step="0.01">
+              </div>
+              
+              <!-- 已知材料 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">已知材料</label>
+                <select id="known-material" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white">
+                  <option value="water">已知水量，求水泥量</option>
+                  <option value="cement">已知水泥量，求水量</option>
+                </select>
+              </div>
+              
+              <!-- 已知量 -->
+              <div>
+                <label for="known-value" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" id="known-value-label">已知水量 (kg/m³)</label>
+                <input type="number" id="known-value" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white" placeholder="请输入已知量" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          
+          <!-- 按钮区域 -->
+          <div class="flex space-x-4">
+            <button id="calculate-btn" class="flex-1 bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-all flex items-center justify-center">
+              <i class="fa fa-calculator mr-2"></i> 计算
+            </button>
+            <button id="reset-btn" class="flex-1 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium py-2 px-4 rounded-lg transition-all flex items-center justify-center">
+              <i class="fa fa-refresh mr-2"></i> 重置
+            </button>
+          </div>
+        </div>
+        
+        <!-- 右侧：结果显示区域 -->
+        <div>
+          <!-- 计算结果 -->
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center">
+              <i class="fa fa-bar-chart text-info mr-2"></i> 计算结果
+            </h3>
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                <p class="text-xs text-gray-500 dark:text-gray-400">水灰比 (W/C)</p>
+                <p id="result-water-cement-ratio" class="text-2xl font-bold">--</p>
+              </div>
+              <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                <p class="text-xs text-gray-500 dark:text-gray-400">灰水比 (C/W)</p>
+                <p id="result-cement-water-ratio" class="text-2xl font-bold">--</p>
+              </div>
+            </div>
+            
+            <!-- 详细结果 -->
+            <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+              <div class="flex justify-between items-center mb-2">
+                <p class="text-sm text-gray-600 dark:text-gray-400">水的用量:</p>
+                <p id="result-water" class="font-medium">-- kg/m³</p>
+              </div>
+              <div class="flex justify-between items-center mb-2">
+                <p class="text-sm text-gray-600 dark:text-gray-400">水泥的用量:</p>
+                <p id="result-cement" class="font-medium">-- kg/m³</p>
+              </div>
+              <div class="flex justify-between items-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">总用量:</p>
+                <p id="result-total" class="font-medium">-- kg/m³</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 可视化图表 -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4 flex items-center">
+              <i class="fa fa-pie-chart text-accent mr-2"></i> 组成比例
+            </h3>
+            <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg h-[200px]">
+              <canvas id="ratio-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 使用说明 -->
+      <div class="mt-8 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-lg">
+        <h4 class="font-medium text-primary flex items-center">
+          <i class="fa fa-info-circle mr-2"></i> 水灰比说明
+        </h4>
+        <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-2">
+          <li>• 水灰比(W/C)是混凝土中水的用量与水泥用量的比值</li>
+          <li>• 水灰比过小会导致混凝土拌合物流动性差，施工困难</li>
+          <li>• 水灰比过大会导致混凝土强度降低，耐久性下降</li>
+          <li>• 一般混凝土的水灰比在0.4-0.7之间</li>
+          <li>• 高强度混凝土的水灰比通常小于0.45</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- 历史记录 -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mt-6 border border-gray-200 dark:border-gray-700">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold flex items-center">
+          <i class="fa fa-history text-purple-500 mr-2"></i> 计算历史记录
+        </h3>
+        <button id="clear-history" class="text-sm text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+          清空记录
+        </button>
+      </div>
+      <div id="history-list" class="max-h-[200px] overflow-y-auto space-y-3">
+        <div class="text-center py-6 text-gray-500 dark:text-gray-400 text-sm">
+          暂无计算历史记录
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DOM元素引用
+    const waterContentInput = document.getElementById('water-content');
+    const cementContentInput = document.getElementById('cement-content');
+    const calculateBtn = document.getElementById('calculate-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const resultWaterCementRatio = document.getElementById('result-water-cement-ratio');
+    const resultCementWaterRatio = document.getElementById('result-cement-water-ratio');
+    const resultWater = document.getElementById('result-water');
+    const resultCement = document.getElementById('result-cement');
+    const resultTotal = document.getElementById('result-total');
+    const ratioChartCanvas = document.getElementById('ratio-chart');
+    const historyList = document.getElementById('history-list');
+    const clearHistoryBtn = document.getElementById('clear-history');
+    const calcByRatioBtn = document.getElementById('calc-by-ratio');
+    const calcByContentBtn = document.getElementById('calc-by-content');
+    const mixDesignSection = document.getElementById('mix-design-section');
+    const targetWaterCementRatioInput = document.getElementById('target-water-cement-ratio');
+    const knownMaterialSelect = document.getElementById('known-material');
+    const knownValueInput = document.getElementById('known-value');
+    const knownValueLabel = document.getElementById('known-value-label');
+    
+    // 图表实例
+    let ratioChart = null;
+    
+    // 初始化图表
+    function initChart() {
+      const ctx = ratioChartCanvas.getContext('2d');
+      
+      // 销毁已存在的图表
+      if (ratioChart) {
+        ratioChart.destroy();
+      }
+      
+      // 创建新图表
+      ratioChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['水', '水泥'],
+          datasets: [{
+            data: [50, 50],
+            backgroundColor: [
+              'rgba(54, 162, 235, 0.6)',
+              'rgba(255, 206, 86, 0.6)'
+            ],
+            borderColor: [
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#4b5563',
+                font: {
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed || 0;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = Math.round((value / total) * 100);
+                  return `${label}: ${percentage}%`;
+                }
+              }
+            }
+          },
+          animation: {
+            animateRotate: true,
+            animateScale: true
+          }
+        }
+      });
+    }
+    
+    // 更新图表
+    function updateChart(water, cement) {
+      if (ratioChart) {
+        ratioChart.data.datasets[0].data = [water, cement];
+        ratioChart.update();
+      }
+    }
+    
+    // 计算水灰比
+    function calculateWaterCementRatio() {
+      let water = parseFloat(waterContentInput.value);
+      let cement = parseFloat(cementContentInput.value);
+      
+      // 输入验证
+      if (isNaN(water) || isNaN(cement) || water <= 0 || cement <= 0) {
+        showNotification('输入错误', '请输入有效的水和水泥用量，数值必须大于0', 'error');
+        return;
+      }
+      
+      // 计算水灰比和灰水比
+      const waterCementRatio = water / cement;
+      const cementWaterRatio = cement / water;
+      const total = water + cement;
+      
+      // 更新结果显示
+      resultWaterCementRatio.textContent = waterCementRatio.toFixed(3);
+      resultCementWaterRatio.textContent = cementWaterRatio.toFixed(3);
+      resultWater.textContent = `${water.toFixed(2)} kg/m³`;
+      resultCement.textContent = `${cement.toFixed(2)} kg/m³`;
+      resultTotal.textContent = `${total.toFixed(2)} kg/m³`;
+      
+      // 更新图表
+      updateChart(water, cement);
+      
+      // 添加到历史记录
+      addToHistory(water, cement, waterCementRatio);
+      
+      // 显示成功消息
+      showNotification('计算成功', '水灰比计算已完成', 'success');
+    }
+    
+    // 根据目标水灰比计算配合比
+    function calculateMixDesign() {
+      const targetRatio = parseFloat(targetWaterCementRatioInput.value);
+      const knownValue = parseFloat(knownValueInput.value);
+      const knownMaterial = knownMaterialSelect.value;
+      
+      // 输入验证
+      if (isNaN(targetRatio) || isNaN(knownValue) || targetRatio <= 0 || knownValue <= 0) {
+        showNotification('输入错误', '请输入有效的目标水灰比和已知量，数值必须大于0', 'error');
+        return;
+      }
+      
+      let water, cement;
+      
+      if (knownMaterial === 'water') {
+        // 已知水量，求水泥量
+        water = knownValue;
+        cement = water / targetRatio;
+      } else {
+        // 已知水泥量，求水量
+        cement = knownValue;
+        water = cement * targetRatio;
+      }
+      
+      // 更新输入框
+      waterContentInput.value = water.toFixed(2);
+      cementContentInput.value = cement.toFixed(2);
+      
+      // 计算并显示结果
+      calculateWaterCementRatio();
+    }
+    
+    // 添加到历史记录
+    function addToHistory(water, cement, ratio) {
+      const timestamp = new Date();
+      const historyItem = {
+        id: Date.now(),
+        water: water,
+        cement: cement,
+        ratio: ratio,
+        timestamp: timestamp.toLocaleString('zh-CN')
+      };
+      
+      // 获取现有历史记录
+      let history = JSON.parse(localStorage.getItem('waterCementRatioHistory') || '[]');
+      
+      // 添加新记录到开头
+      history.unshift(historyItem);
+      
+      // 限制历史记录数量
+      if (history.length > 10) {
+        history = history.slice(0, 10);
+      }
+      
+      // 保存到localStorage
+      localStorage.setItem('waterCementRatioHistory', JSON.stringify(history));
+      
+      // 更新历史记录显示
+      displayHistory();
+    }
+    
+    // 显示历史记录
+    function displayHistory() {
+      const history = JSON.parse(localStorage.getItem('waterCementRatioHistory') || '[]');
+      
+      if (history.length === 0) {
+        historyList.innerHTML = `
+          <div class="text-center py-6 text-gray-500 dark:text-gray-400 text-sm">
+            暂无计算历史记录
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      history.forEach(item => {
+        html += `
+          <div class="p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+            <div class="flex justify-between items-center mb-1">
+              <p class="font-medium">W/C: ${item.ratio.toFixed(3)}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">${item.timestamp}</p>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+              <p>水: ${item.water.toFixed(2)} kg/m³</p>
+              <p>水泥: ${item.cement.toFixed(2)} kg/m³</p>
+            </div>
+          </div>
+        `;
+      });
+      
+      historyList.innerHTML = html;
+    }
+    
+    // 清空历史记录
+    function clearHistory() {
+      localStorage.removeItem('waterCementRatioHistory');
+      displayHistory();
+      showNotification('已清空', '历史记录已全部清空', 'info');
+    }
+    
+    // 重置表单
+    function resetForm() {
+      // 清空输入框
+      waterContentInput.value = '';
+      cementContentInput.value = '';
+      targetWaterCementRatioInput.value = '';
+      knownValueInput.value = '';
+      
+      // 重置结果显示
+      resultWaterCementRatio.textContent = '--';
+      resultCementWaterRatio.textContent = '--';
+      resultWater.textContent = '-- kg/m³';
+      resultCement.textContent = '-- kg/m³';
+      resultTotal.textContent = '-- kg/m³';
+      
+      // 重置图表
+      updateChart(0, 0);
+      
+      // 切换到水灰比计算模式
+      calcByRatioBtn.click();
+      
+      showNotification('已重置', '表单已重置', 'info');
+    }
+    
+    // 切换计算模式
+    function switchCalculationMode(isRatioCalculation) {
+      if (isRatioCalculation) {
+        // 水灰比计算模式
+        calcByRatioBtn.classList.remove('border', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
+        calcByRatioBtn.classList.add('bg-primary', 'text-white', 'hover:bg-primary/90');
+        calcByContentBtn.classList.remove('bg-primary', 'text-white', 'hover:bg-primary/90');
+        calcByContentBtn.classList.add('border', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
+        mixDesignSection.classList.add('hidden');
+        calculateBtn.innerHTML = '<i class="fa fa-calculator mr-2"></i> 计算';
+      } else {
+        // 配合比计算模式
+        calcByContentBtn.classList.remove('border', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
+        calcByContentBtn.classList.add('bg-primary', 'text-white', 'hover:bg-primary/90');
+        calcByRatioBtn.classList.remove('bg-primary', 'text-white', 'hover:bg-primary/90');
+        calcByRatioBtn.classList.add('border', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
+        mixDesignSection.classList.remove('hidden');
+        calculateBtn.innerHTML = '<i class="fa fa-calculator mr-2"></i> 计算配合比';
+      }
+    }
+    
+    // 显示通知（如果在父页面中调用则使用父页面的函数，否则使用此函数）
+    function showNotification(title, message, type = 'info') {
+      if (typeof window.parent.showNotification === 'function') {
+        window.parent.showNotification(title, message, type);
+      } else {
+        // 简单的通知实现
+        alert(`${title}: ${message}`);
+      }
+    }
+    
+    // 初始化函数
+    function init() {
+      // 初始化图表
+      initChart();
+      
+      // 加载历史记录
+      displayHistory();
+      
+      // 事件监听器
+      calculateBtn.addEventListener('click', function() {
+        if (mixDesignSection.classList.contains('hidden')) {
+          calculateWaterCementRatio();
+        } else {
+          calculateMixDesign();
+        }
+      });
+      
+      resetBtn.addEventListener('click', resetForm);
+      clearHistoryBtn.addEventListener('click', clearHistory);
+      
+      // 切换计算模式
+      calcByRatioBtn.addEventListener('click', () => switchCalculationMode(true));
+      calcByContentBtn.addEventListener('click', () => switchCalculationMode(false));
+      
+      // 已知材料选择变化
+      knownMaterialSelect.addEventListener('change', function() {
+        if (this.value === 'water') {
+          knownValueLabel.textContent = '已知水量 (kg/m³)';
+        } else {
+          knownValueLabel.textContent = '已知水泥量 (kg/m³)';
+        }
+      });
+      
+      // 监听输入变化，实时更新主题色
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.attributeName === 'class' && document.documentElement.classList.contains('dark')) {
+            initChart(); // 重新初始化图表以更新颜色
+          }
+        });
+      });
+      
+      observer.observe(document.documentElement, {
+        attributes: true
+      });
+      
+      // 添加键盘快捷键
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.target.matches('textarea, select')) {
+          calculateBtn.click();
+        }
+        if (e.key === 'Escape') {
+          resetBtn.click();
+        }
+      });
+    }
+    
+    // 当DOM加载完成后初始化
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+  <script>
+    // 主题切换功能
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    function applyThemeIcon() {
+      const isDark = document.documentElement.classList.contains('dark');
+      themeToggleBtn.textContent = isDark ? '☀️' : '🌙';
+    }
+    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+    applyThemeIcon();
+    themeToggleBtn.addEventListener('click', function() {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      applyThemeIcon();
+    });
+  </script>
+</body>
+</html>
