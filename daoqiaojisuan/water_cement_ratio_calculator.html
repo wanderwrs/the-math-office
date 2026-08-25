@@ -466,7 +466,7 @@
     
     // 显示通知（如果在父页面中调用则使用父页面的函数，否则使用此函数）
     function showNotification(title, message, type = 'info') {
-      if (typeof window.parent.showNotification === 'function') {
+      if (window.parent && window.parent !== window && typeof window.parent.showNotification === 'function') {
         window.parent.showNotification(title, message, type);
       } else {
         // 简单的通知实现
