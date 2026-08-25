@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水泥净浆与砂浆水泥计算器</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --secondary-color: #6b7280;
+            --secondary-hover: #4b5563;
+            --background-color: #ffffff;
+            --card-background: #f9fafb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --border-radius: 0.5rem;
+            --transition: all 0.2s ease-in-out;
+        }
+
+        .dark-mode {
+            --primary-color: #60a5fa;
+            --primary-hover: #3b82f6;
+            --secondary-color: #9ca3af;
+            --secondary-hover: #d1d5db;
+            --background-color: #111827;
+            --card-background: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border-color: #374151;
+            --error-color: #f87171;
+            --success-color: #34d399;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .navbar {
+            background-color: var(--background-color);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .navbar-brand:hover {
+            color: var(--primary-hover);
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-home {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-home:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        .btn-theme {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .btn-theme:hover {
+            background-color: var(--card-background);
+        }
+
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 {
+            color: var(--text-primary);
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-header span {
+            font-size: 1.5rem;
+        }
+
+        .card-title {
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 0.75rem;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .input-with-unit {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-unit {
+            position: absolute;
+            right: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            pointer-events: none;
+        }
+
+        .input-with-unit .form-input {
+            padding-right: 3rem;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.75rem;
+            display: none;
+            margin-top: 0.25rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        .calculator-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-button:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        #result-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background-color: var(--background-color);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .result-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .result-value {
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .result-status {
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+        }
+
+        .explanation-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .explanation-content h4 {
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .explanation-content p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .explanation-content ul, .explanation-content ol {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            padding-left: 1.5rem;
+        }
+
+        .explanation-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .formula {
+            background-color: var(--background-color);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .navbar-content {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem 0;
+            }
+
+            .page-title h1 {
+                font-size: 1.5rem;
+            }
+
+            .tab-button {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+    <!-- 统一样式 -->
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="index.html" class="navbar-brand">🧮 道路工程计算器</a>
+            <div class="navbar-actions">
+                <a href="index.html" class="btn-home">🏠 返回首页</a>
+                <button id="theme-toggle" class="btn-theme" title="切换主题">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <div class="container">
+            <!-- 页面标题 -->
+            <div class="page-title">
+                <h1>水泥净浆与砂浆水泥计算器</h1>
+                <p>本计算器用于计算水泥净浆和砂浆的配合比，帮助评估水泥的物理性能指标</p>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="content-wrapper">
+                <!-- 计算器表单区域 -->
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>🔬</span>
+                            <h2 class="card-title">实验数据输入</h2>
+                        </div>
+
+                        <!-- 计算类型选择标签页 -->
+                        <div class="calculator-tabs">
+                            <button id="paste-tab" class="tab-button active" onclick="switchTab('paste')">
+                                🧪 水泥净浆计算
+                            </button>
+                            <button id="mortar-tab" class="tab-button" onclick="switchTab('mortar')">
+                                🧱 砂浆水泥计算
+                            </button>
+                        </div>
+
+                        <!-- 水泥净浆计算表单 -->
+                        <div id="paste-content" class="tab-content active">
+                            <form id="paste-calculator-form">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="paste-sample-name" class="form-label">样品编号/名称</label>
+                                        <input type="text" id="paste-sample-name" class="form-input" placeholder="例如：P.O42.5">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="paste-test-date" class="form-label">测试日期</label>
+                                        <input type="date" id="paste-test-date" class="form-input">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="paste-cement-mass" class="form-label">水泥质量</label>
+                                        <div class="input-with-unit">
+                                            <input type="number" id="paste-cement-mass" class="form-input" placeholder="输入水泥质量" min="0" step="0.01" required>
+                                            <span class="input-unit">g</span>
+                                        </div>
+                                        <p id="paste-cement-mass-error" class="error-message">请输入有效的质量值</p>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="paste-water-ratio" class="form-label">水灰比</label>
+                                        <div class="input-with-unit">
+                                            <input type="number" id="paste-water-ratio" class="form-input" placeholder="输入水灰比" min="0" step="0.01" required>
+                                            <span class="input-unit">W/C</span>
+                                        </div>
+                                        <p id="paste-water-ratio-error" class="error-message">请输入有效的水灰比值</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="btn-group">
+                                    <button type="submit" class="btn btn-primary">
+                                        📊 计算水泥净浆配合比
+                                    </button>
+                                    <button type="reset" class="btn btn-secondary">
+                                        🔄 重置
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- 砂浆水泥计算表单 -->
+                        <div id="mortar-content" class="tab-content">
+                            <form id="mortar-calculator-form">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="mortar-sample-name" class="form-label">样品编号/名称</label>
+                                        <input type="text" id="mortar-sample-name" class="form-input" placeholder="例如：M15">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="mortar-test-date" class="form-label">测试日期</label>
+                                        <input type="date" id="mortar-test-date" class="form-input">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="mortar-cement-mass" class="form-label">水泥质量</label>
+                                        <div class="input-with-unit">
+                                            <input type="number" id="mortar-cement-mass" class="form-input" placeholder="输入水泥质量" min="0" step="0.01" required>
+                                            <span class="input-unit">g</span>
+                                        </div>
+                                        <p id="mortar-cement-mass-error" class="error-message">请输入有效的质量值</p>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="mortar-sand-ratio" class="form-label">灰砂比</label>
+                                        <div class="input-with-unit">
+                                            <input type="number" id="mortar-sand-ratio" class="form-input" placeholder="输入灰砂比" min="0" step="0.01" required>
+                                            <span class="input-unit">C/S</span>
+                                        </div>
+                                        <p id="mortar-sand-ratio-error" class="error-message">请输入有效的灰砂比值</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="mortar-water-ratio" class="form-label">水灰比</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" id="mortar-water-ratio" class="form-input" placeholder="输入水灰比" min="0" step="0.01" required>
+                                        <span class="input-unit">W/C</span>
+                                    </div>
+                                    <p id="mortar-water-ratio-error" class="error-message">请输入有效的水灰比值</p>
+                                </div>
+                                
+                                <div class="btn-group">
+                                    <button type="submit" class="btn btn-primary">
+                                        📊 计算砂浆配合比
+                                    </button>
+                                    <button type="reset" class="btn btn-secondary">
+                                        🔄 重置
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 说明卡片 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span>ℹ️</span>
+                            <h2 class="card-title">计算说明</h2>
+                        </div>
+                        <div class="explanation-content">
+                            <div id="paste-explanation">
+                                <h4>水泥净浆定义</h4>
+                                <p>水泥净浆是指水泥与水按一定比例配制而成的浆体，不掺加其他掺合料。</p>
+                                
+                                <h4>计算公式</h4>
+                                <div class="formula">
+                                    用水量(kg) = 水泥质量(kg) × 水灰比<br>
+                                    净浆总量(kg) = 水泥质量(kg) + 用水量(kg)
+                                </div>
+                                
+                                <h4>常用水灰比范围</h4>
+                                <ul>
+                                    <li>标准稠度用水量：约0.26-0.33</li>
+                                    <li>混凝土配合比：约0.4-0.7</li>
+                                    <li>水泥净浆试块：约0.4-0.5</li>
+                                </ul>
+                            </div>
+
+                            <div id="mortar-explanation" style="display: none;">
+                                <h4>砂浆定义</h4>
+                                <p>砂浆是由水泥、细骨料（砂）和水按一定比例配制而成的建筑材料。</p>
+                                
+                                <h4>计算公式</h4>
+                                <div class="formula">
+                                    砂质量(kg) = 水泥质量(kg) ÷ 灰砂比<br>
+                                    用水量(kg) = 水泥质量(kg) × 水灰比<br>
+                                    砂浆总量(kg) = 水泥质量(kg) + 砂质量(kg) + 用水量(kg)
+                                </div>
+                                
+                                <h4>常用配合比参考</h4>
+                                <ul>
+                                    <li>M5砂浆：灰砂比约1:5-1:6</li>
+                                    <li>M7.5砂浆：灰砂比约1:4-1:5</li>
+                                    <li>M10砂浆：灰砂比约1:3-1:4</li>
+                                    <li>M15砂浆：灰砂比约1:2-1:3</li>
+                                    <li>水灰比通常在0.4-0.5之间</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 结果显示区域 -->
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>📈</span>
+                            <h2 class="card-title">计算结果</h2>
+                        </div>
+                        
+                        <div id="result-container">
+                            <div class="result-item">
+                                <span class="result-label">样品信息</span>
+                                <span id="result-sample" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">计算类型</span>
+                                <span id="result-type" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">水泥质量</span>
+                                <span id="result-cement-mass" class="result-value">--</span>
+                            </div>
+                            <div id="result-sand-container" class="result-item" style="display: none;">
+                                <span class="result-label">砂质量</span>
+                                <span id="result-sand-mass" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">用水量</span>
+                                <span id="result-water-mass" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">材料总量</span>
+                                <span id="result-total-mass" class="result-value">--</span>
+                            </div>
+                            <div id="result-paste-ratio-container" class="result-item" style="display: none;">
+                                <span class="result-label">水灰比</span>
+                                <span id="result-paste-ratio" class="result-value">--</span>
+                            </div>
+                            <div id="result-mortar-ratios-container" class="result-item" style="display: none;">
+                                <span class="result-label">灰砂比/水灰比</span>
+                                <span id="result-mortar-ratios" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">状态</span>
+                                <span id="result-status" class="result-status">等待计算</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 设置默认日期为今天
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('paste-test-date').value = today;
+            document.getElementById('mortar-test-date').value = today;
+            
+            // 初始化主题
+            if (localStorage.getItem('theme') === 'dark' || 
+                (!localStorage.getItem('theme') && 
+                 window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('theme-toggle').innerHTML = '☀️';
+            }
+        });
+
+        // 主题切换功能
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            this.innerHTML = isDarkMode ? '☀️' : '🌙';
+        });
+
+        // 切换标签页
+        function switchTab(tabName) {
+            // 隐藏所有内容
+            document.getElementById('paste-content').classList.remove('active');
+            document.getElementById('mortar-content').classList.remove('active');
+            document.getElementById('paste-explanation').style.display = 'none';
+            document.getElementById('mortar-explanation').style.display = 'none';
+            
+            // 移除所有标签按钮的active状态
+            document.getElementById('paste-tab').classList.remove('active');
+            document.getElementById('mortar-tab').classList.remove('active');
+            
+            // 显示选中的内容和标签
+            if (tabName === 'paste') {
+                document.getElementById('paste-content').classList.add('active');
+                document.getElementById('paste-tab').classList.add('active');
+                document.getElementById('paste-explanation').style.display = 'block';
+            } else if (tabName === 'mortar') {
+                document.getElementById('mortar-content').classList.add('active');
+                document.getElementById('mortar-tab').classList.add('active');
+                document.getElementById('mortar-explanation').style.display = 'block';
+            }
+            
+            // 重置结果显示
+            resetResults();
+        }
+
+        // 重置结果显示
+        function resetResults() {
+            updateResult('--', '--', '--', '--', '--', '--', '--', '--', '等待计算');
+            hideAllErrors();
+        }
+
+        // 水泥净浆表单提交事件处理
+        document.getElementById('paste-calculator-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculatePaste();
+        });
+
+        // 砂浆表单提交事件处理
+        document.getElementById('mortar-calculator-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateMortar();
+        });
+
+        // 重置按钮事件处理
+        document.getElementById('paste-calculator-form').addEventListener('reset', function() {
+            setTimeout(function() {
+                resetResults();
+            }, 0);
+        });
+
+        document.getElementById('mortar-calculator-form').addEventListener('reset', function() {
+            setTimeout(function() {
+                resetResults();
+            }, 0);
+        });
+
+        // 计算水泥净浆
+        function calculatePaste() {
+            // 获取输入值
+            const sampleName = document.getElementById('paste-sample-name').value || '未命名';
+            const cementMass = parseFloat(document.getElementById('paste-cement-mass').value);
+            const waterRatio = parseFloat(document.getElementById('paste-water-ratio').value);
+            
+            // 验证输入
+            let isValid = true;
+            hideAllErrors();
+            
+            if (isNaN(cementMass) || cementMass <= 0) {
+                showError('paste-cement-mass-error', '请输入有效的水泥质量值');
+                isValid = false;
+            }
+            
+            if (isNaN(waterRatio) || waterRatio <= 0) {
+                showError('paste-water-ratio-error', '请输入有效的水灰比值');
+                isValid = false;
+            }
+            
+            if (waterRatio > 2) {
+                showError('paste-water-ratio-error', '水灰比通常不应大于2');
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            // 计算用水量和总量
+            const waterMass = cementMass * waterRatio;
+            const totalMass = cementMass + waterMass;
+            
+            // 格式化结果
+            const formattedCementMass = cementMass.toFixed(2) + 'g';
+            const formattedWaterMass = waterMass.toFixed(2) + 'g';
+            const formattedTotalMass = totalMass.toFixed(2) + 'g';
+            const formattedWaterRatio = waterRatio.toFixed(2);
+            
+            // 更新结果显示
+            updateResult(
+                sampleName, 
+                '水泥净浆',
+                formattedCementMass, 
+                '', // 砂质量为空
+                formattedWaterMass, 
+                formattedTotalMass, 
+                formattedWaterRatio, 
+                '', // 砂浆比为空
+                '计算完成'
+            );
+            
+            // 显示/隐藏相关结果项
+            document.getElementById('result-sand-container').style.display = 'none';
+            document.getElementById('result-paste-ratio-container').style.display = 'flex';
+            document.getElementById('result-mortar-ratios-container').style.display = 'none';
+        }
+
+        // 计算砂浆配合比
+        function calculateMortar() {
+            // 获取输入值
+            const sampleName = document.getElementById('mortar-sample-name').value || '未命名';
+            const cementMass = parseFloat(document.getElementById('mortar-cement-mass').value);
+            const sandRatio = parseFloat(document.getElementById('mortar-sand-ratio').value);
+            const waterRatio = parseFloat(document.getElementById('mortar-water-ratio').value);
+            
+            // 验证输入
+            let isValid = true;
+            hideAllErrors();
+            
+            if (isNaN(cementMass) || cementMass <= 0) {
+                showError('mortar-cement-mass-error', '请输入有效的水泥质量值');
+                isValid = false;
+            }
+            
+            if (isNaN(sandRatio) || sandRatio <= 0) {
+                showError('mortar-sand-ratio-error', '请输入有效的灰砂比值');
+                isValid = false;
+            }
+            
+            if (isNaN(waterRatio) || waterRatio <= 0) {
+                showError('mortar-water-ratio-error', '请输入有效的水灰比值');
+                isValid = false;
+            }
+            
+            if (sandRatio > 1) {
+                showError('mortar-sand-ratio-error', '灰砂比通常小于1（水泥:砂）');
+                isValid = false;
+            }
+            
+            if (waterRatio > 2) {
+                showError('mortar-water-ratio-error', '水灰比通常不应大于2');
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            // 计算砂质量、用水量和总量
+            const sandMass = cementMass / sandRatio;
+            const waterMass = cementMass * waterRatio;
+            const totalMass = cementMass + sandMass + waterMass;
+            
+            // 格式化结果
+            const formattedCementMass = cementMass.toFixed(2) + 'g';
+            const formattedSandMass = sandMass.toFixed(2) + 'g';
+            const formattedWaterMass = waterMass.toFixed(2) + 'g';
+            const formattedTotalMass = totalMass.toFixed(2) + 'g';
+            const formattedRatios = sandRatio.toFixed(2) + '/' + waterRatio.toFixed(2);
+            
+            // 更新结果显示
+            updateResult(
+                sampleName, 
+                '砂浆水泥',
+                formattedCementMass, 
+                formattedSandMass, 
+                formattedWaterMass, 
+                formattedTotalMass, 
+                '', // 水泥净浆比为空
+                formattedRatios, 
+                '计算完成'
+            );
+            
+            // 显示/隐藏相关结果项
+            document.getElementById('result-sand-container').style.display = 'flex';
+            document.getElementById('result-paste-ratio-container').style.display = 'none';
+            document.getElementById('result-mortar-ratios-container').style.display = 'flex';
+        }
+
+        // 更新结果显示
+        function updateResult(sample, type, cementMass, sandMass, waterMass, totalMass, pasteRatio, mortarRatios, status) {
+            document.getElementById('result-sample').textContent = sample;
+            document.getElementById('result-type').textContent = type;
+            document.getElementById('result-cement-mass').textContent = cementMass;
+            document.getElementById('result-sand-mass').textContent = sandMass;
+            document.getElementById('result-water-mass').textContent = waterMass;
+            document.getElementById('result-total-mass').textContent = totalMass;
+            document.getElementById('result-paste-ratio').textContent = pasteRatio;
+            document.getElementById('result-mortar-ratios').textContent = mortarRatios;
+            document.getElementById('result-status').textContent = status;
+        }
+
+        // 显示错误信息
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        // 隐藏所有错误信息
+        function hideAllErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(element => {
+                element.style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>
