@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水泥标准稠度用水量实验计算器</title>
+    <style>
+        /* 全局样式 */
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --light-bg: #f8fafc;
+            --light-text: #1e293b;
+            --light-card: #ffffff;
+            --light-border: #e2e8f0;
+            --light-input: #f1f5f9;
+            --dark-bg: #0f172a;
+            --dark-text: #f1f5f9;
+            --dark-card: #1e293b;
+            --dark-border: #334155;
+            --dark-input: #475569;
+            --border-radius: 0.75rem;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--light-text);
+            background-color: var(--light-bg);
+            transition: var(--transition);
+        }
+
+        body.dark-mode {
+            color: var(--dark-text);
+            background-color: var(--dark-bg);
+        }
+
+        /* 容器 */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            background-color: var(--light-card);
+            box-shadow: var(--box-shadow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .navbar {
+            background-color: var(--dark-card);
+        }
+
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-theme {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--secondary-color);
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .btn-theme:hover {
+            background-color: var(--light-input);
+        }
+
+        body.dark-mode .btn-theme:hover {
+            background-color: var(--dark-input);
+        }
+
+        .btn-home {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .btn-home:hover {
+            background-color: var(--light-input);
+        }
+
+        body.dark-mode .btn-home:hover {
+            background-color: var(--dark-input);
+        }
+
+        /* 主内容 */
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .page-title p {
+            color: var(--secondary-color);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 卡片 */
+        .card {
+            background-color: var(--light-card);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .card {
+            background-color: var(--dark-card);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 0.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* 表单 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--light-border);
+            border-radius: var(--border-radius);
+            background-color: var(--light-input);
+            color: var(--light-text);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .form-input {
+            border-color: var(--dark-border);
+            background-color: var(--dark-input);
+            color: var(--dark-text);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .input-with-unit {
+            position: relative;
+        }
+
+        .input-unit {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+            pointer-events: none;
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        /* 按钮 */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* 结果区域 */
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        body.dark-mode .result-item {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.25rem;
+        }
+
+        /* 说明卡片 */
+        .explanation-content {
+            line-height: 1.7;
+        }
+
+        .explanation-content h4 {
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .explanation-content ul, .explanation-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .explanation-content li {
+            margin-bottom: 0.25rem;
+        }
+
+        .formula {
+            background-color: var(--light-input);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        body.dark-mode .formula {
+            background-color: var(--dark-input);
+        }
+
+        /* 响应式布局 */
+        @media (min-width: 992px) {
+            .content-wrapper {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+    <!-- 统一样式 -->
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="index.html" class="navbar-brand">🧮 道路工程计算器</a>
+            <div class="navbar-actions">
+                <a href="index.html" class="btn-home">🏠 返回首页</a>
+                <button id="theme-toggle" class="btn-theme" title="切换主题">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <div class="container">
+            <!-- 页面标题 -->
+            <div class="page-title">
+                <h1>水泥标准稠度用水量实验计算器</h1>
+                <p>本计算器用于计算水泥标准稠度用水量的百分比，帮助评估水泥的物理性能指标</p>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="content-wrapper">
+                <!-- 计算器表单区域 -->
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>🔬</span>
+                            <h2 class="card-title">实验数据输入</h2>
+                        </div>
+                        
+                        <form id="consistency-calculator-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="sample-name" class="form-label">样品编号/名称</label>
+                                    <input type="text" id="sample-name" class="form-input" placeholder="例如：P.O42.5">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="test-date" class="form-label">测试日期</label>
+                                    <input type="date" id="test-date" class="form-input">
+                                </div>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="cement-mass" class="form-label">水泥质量</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" id="cement-mass" class="form-input" placeholder="输入水泥质量" min="0" step="0.01" required>
+                                        <span class="input-unit">g</span>
+                                    </div>
+                                    <p id="cement-mass-error" class="error-message">请输入有效的质量值</p>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="water-mass" class="form-label">用水量</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" id="water-mass" class="form-input" placeholder="输入用水量" min="0" step="0.01" required>
+                                        <span class="input-unit">g</span>
+                                    </div>
+                                    <p id="water-mass-error" class="error-message">请输入有效的水量值</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="needle-distance" class="form-label">试杆距地板距离</label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="needle-distance" class="form-input" placeholder="输入试杆距地板距离" min="0" step="0.1">
+                                    <span class="input-unit">mm</span>
+                                </div>
+                                <p id="needle-distance-error" class="error-message">请输入有效的距离值</p>
+                            </div>
+                            
+                            <div class="btn-group">
+                                <button type="submit" id="calculate-btn" class="btn btn-primary">
+                                    📊 计算标准稠度用水量
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    🔄 重置
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- 说明卡片 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span>ℹ️</span>
+                            <h2 class="card-title">计算说明</h2>
+                        </div>
+                        <div class="explanation-content">
+                            <h4>标准稠度用水量定义</h4>
+                            <p>标准稠度用水量是指水泥净浆达到标准稠度时的用水量与水泥质量的百分比。</p>
+                            
+                            <h4>计算公式</h4>
+                            <div class="formula">
+                                标准稠度用水量(%) = (用水量(g) / 水泥质量(g)) × 100%
+                            </div>
+                            
+                            <h4>标准稠度判定标准</h4>
+                            <ul>
+                                <li>试杆距地板距离为5mm±1mm时，达到标准稠度</li>
+                                <li>试杆距地板距离大于6mm时，说明水泥净浆过稀</li>
+                                <li>试杆距地板距离小于4mm时，说明水泥净浆过稠</li>
+                            </ul>
+                            
+                            <h4>实验要点</h4>
+                            <ol>
+                                <li>水泥试样质量通常取500g</li>
+                                <li>用水量应根据水泥品种和标号适当调整</li>
+                                <li>测定时应控制试验温度在20℃±2℃</li>
+                                <li>水泥净浆搅拌应按标准方法进行</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 结果显示区域 -->
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>📈</span>
+                            <h2 class="card-title">计算结果</h2>
+                        </div>
+                        
+                        <div id="result-container">
+                            <div class="result-item">
+                                <span class="result-label">样品信息</span>
+                                <span id="result-sample" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">水泥质量</span>
+                                <span id="result-cement-mass" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">用水量</span>
+                                <span id="result-water-mass" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">标准稠度用水量</span>
+                                <span id="result-consistency" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">试杆距地板距离</span>
+                                <span id="result-needle-distance" class="result-value">--</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">稠度评定</span>
+                                <span id="result-status" class="result-status">等待计算</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 设置默认日期为今天
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('test-date').value = today;
+            
+            // 初始化主题
+            if (localStorage.getItem('theme') === 'dark' || 
+                (!localStorage.getItem('theme') && 
+                 window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('theme-toggle').innerHTML = '☀️';
+            }
+        });
+
+        // 主题切换功能
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            this.innerHTML = isDarkMode ? '☀️' : '🌙';
+        });
+
+        // 表单提交事件处理
+        document.getElementById('consistency-calculator-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateConsistency();
+        });
+
+        // 重置按钮事件处理
+        document.getElementById('consistency-calculator-form').addEventListener('reset', function() {
+            setTimeout(function() {
+                updateResult('--', '--', '--', '--', '--', '等待计算', '');
+                hideErrors();
+            }, 0);
+        });
+
+        // 计算标准稠度用水量
+        function calculateConsistency() {
+            // 获取输入值
+            const sampleName = document.getElementById('sample-name').value || '未命名';
+            const cementMass = parseFloat(document.getElementById('cement-mass').value);
+            const waterMass = parseFloat(document.getElementById('water-mass').value);
+            const needleDistance = parseFloat(document.getElementById('needle-distance').value);
+            
+            // 验证输入
+            let isValid = true;
+            hideErrors();
+            
+            if (isNaN(cementMass) || cementMass <= 0) {
+                showError('cement-mass-error', '请输入有效的水泥质量值');
+                isValid = false;
+            }
+            
+            if (isNaN(waterMass) || waterMass <= 0) {
+                showError('water-mass-error', '请输入有效的用水量值');
+                isValid = false;
+            }
+            
+            if (waterMass > cementMass) {
+                showError('water-mass-error', '用水量不能大于水泥质量');
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            // 计算标准稠度用水量
+            const consistency = (waterMass / cementMass) * 100;
+            
+            // 格式化结果
+            const formattedConsistency = consistency.toFixed(2) + '%';
+            const formattedCementMass = cementMass.toFixed(2) + 'g';
+            const formattedWaterMass = waterMass.toFixed(2) + 'g';
+            const formattedNeedleDistance = isNaN(needleDistance) ? '--' : needleDistance.toFixed(1) + 'mm';
+            
+            // 评定稠度状态
+            let statusText = '计算完成';
+            
+            if (!isNaN(needleDistance)) {
+                if (needleDistance >= 4 && needleDistance <= 6) {
+                    statusText = '达到标准稠度';
+                } else if (needleDistance > 6) {
+                    statusText = '净浆过稀';
+                } else if (needleDistance < 4) {
+                    statusText = '净浆过稠';
+                }
+            }
+            
+            // 更新结果显示
+            updateResult(sampleName, formattedCementMass, formattedWaterMass, formattedConsistency, formattedNeedleDistance, statusText);
+        }
+
+        // 更新结果显示
+        function updateResult(sample, cementMass, waterMass, consistency, needleDistance, status, statusClass) {
+            document.getElementById('result-sample').textContent = sample;
+            document.getElementById('result-cement-mass').textContent = cementMass;
+            document.getElementById('result-water-mass').textContent = waterMass;
+            document.getElementById('result-consistency').textContent = consistency;
+            document.getElementById('result-needle-distance').textContent = needleDistance;
+            
+            const statusElement = document.getElementById('result-status');
+            statusElement.textContent = status;
+        }
+
+        // 显示错误信息
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        // 隐藏所有错误信息
+        function hideErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(element => {
+                element.style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>
