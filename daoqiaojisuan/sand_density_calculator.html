@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>砂子堆积密度和孔隙率实验计算器</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#10b981',
+            accent: '#f59e0b',
+            danger: '#ef4444',
+            info: '#6366f1',
+            dark: {
+              bg: '#111827',
+              card: '#1f2937',
+              border: '#374151'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.3s ease-in-out',
+            'slide-up': 'slideUp 0.3s ease-out',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            slideUp: {
+              '0%': { transform: 'translateY(10px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' },
+            },
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义工具类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+      .card-shadow-dark {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+      }
+      .hover-lift {
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .input-focus {
+        @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+      }
+      .btn-primary {
+        @apply bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-all input-focus flex items-center justify-center gap-2;
+      }
+      .btn-secondary {
+        @apply bg-secondary hover:bg-secondary/90 text-white font-medium py-2 px-4 rounded-lg transition-all input-focus flex items-center justify-center gap-2;
+      }
+      .btn-responsive {
+        @apply w-full;
+      }
+      .chart-container {
+        height: 300px;
+      }
+      .mobile-padding {
+        @apply px-3;
+      }
+      .input-mobile {
+        @apply py-3;
+      }
+      @media (max-width: 640px) {
+        .chart-container {
+          height: 220px;
+        }
+        .main-content {
+          padding-left: 0.75rem;
+          padding-right: 0.75rem;
+        }
+        .card-padding {
+          padding: 1rem;
+        }
+        .header-title {
+          font-size: 1.3rem;
+        }
+        .header-subtitle {
+          font-size: 0.9rem;
+        }
+        .card-title {
+          font-size: 1.2rem;
+        }
+        .result-value {
+          font-size: 1.8rem;
+        }
+        .history-item {
+          font-size: 0.85rem;
+        }
+      }
+      @media (max-width: 480px) {
+        .chart-container {
+          height: 200px;
+        }
+        .mobile-btn-padding {
+          @apply py-3;
+        }
+        .mobile-input-padding {
+          @apply px-3 py-3;
+        }
+      }
+    }
+  </style>
+  <!-- 统一样式 -->
+  <link rel="stylesheet" href="common.css">
+</head>
+<body class="bg-gray-50 dark:bg-dark-bg transition-colors duration-300 min-h-screen">
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="container navbar-content">
+      <a href="index.html" class="navbar-brand">🧮 道路工程计算器</a>
+      <div class="navbar-actions">
+        <a href="index.html" class="btn-home">🏠 返回首页</a>
+        <button id="theme-toggle" class="btn-theme" title="切换主题">
+          <i class="fa fa-moon-o dark:hidden text-gray-700"></i>
+          <i class="fa fa-sun-o hidden dark:block text-yellow-300"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+  <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- 头部 -->
+    <header class="mb-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="animate-fade-in">
+          <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-800 dark:text-white mb-2">
+            <i class="fa fa-flask text-primary mr-2"></i>
+            砂子堆积密度和孔隙率实验计算器
+          </h1>
+          <p class="text-gray-600 dark:text-gray-300">用于计算砂子的松散堆积密度、密集堆积密度及孔隙率</p>
+        </div>
+        
+        <!-- 帮助按钮 -->
+        <div class="flex items-center gap-3">
+          <button id="help-btn" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+            <i class="fa fa-question text-gray-700 dark:text-gray-300"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- 输入表单 -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- 基本信息 -->
+        <div class="bg-white dark:bg-dark-card rounded-xl p-6 card-shadow dark:card-shadow-dark animate-fade-in hover-lift">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+            <i class="fa fa-info-circle text-info mr-2"></i>
+            基本信息
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="sample-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">样品编号</label>
+              <input type="text" id="sample-name" class="w-full px-4 py-2 border border-gray-300 dark:border-dark-border dark:bg-dark-bg dark:text-white rounded-lg input-focus mobile-input-padding">
+            </div>
+            <div>
+              <label for="test-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">试验日期</label>
+              <input type="date" id="test-date" class="w-full px-4 py-2 border border-gray-300 dark:border-dark-border dark:bg-dark-bg dark:text-white rounded-lg input-focus mobile-input-padding">
+            </div>
+            <div>
+              <label for="operator" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">试验人员</label>
+              <input type="text" id="operator" class="w-full px-4 py-2 border border-gray-300 dark:border-dark-border dark:bg-dark-bg dark:text-white rounded-lg input-focus mobile-input-padding">
+            </div>
+            <div>
+              <label for="sand-density" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">砂的密度 (g/cm³)</label>
+              <input type="number" id="sand-density" step="0.01" value="2.65" min="2.5" max="2.75" class="w-full px-4 py-2 border border-gray-300 dark:border-dark-border dark:bg-dark-bg dark:text-white rounded-lg input-focus mobile-input-padding">
+            </div>
+          </div>
+        </div>
+        
+        <!-- 松散堆积密度 -->
+        <div class="bg-white dark:bg-dark-card rounded-xl p-6 card-shadow dark:card-shadow-dark animate-fade-in hover-lift">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+            <i class="fa fa-database text-primary mr-2"></i>
+            松散堆积密度
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="loose-container-weight" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">容量筒质量 (g)</label>
+              <input type="number" id="loose-container-weight" step="0.1" class="w-full px-4 py-2 border border-gray-300 dark:border-dark-border dark:bg-dark-bg dark:text-white rounded-lg input-focus mobile-input-padding">
+            </div>
+            <div>
+              <label for="loose-total-weight" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">容量筒+砂总质量 (g)</label>
+              <input type="number" id="loose-total-weight" step="0.1" class="w-full px-4 py-2 border border-gray-300 dark:border-dark-border dark:bg-dark-bg dark:text-white rounded-lg input-focus mobile-input-padding">
+            </div>
+            <div>
+              <label for="loose-container-volume" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">容量筒容积 (cm³)</label>
+              <input type="number" id="loose-container-volume" step="1" value="1000" class="w-full px-4 py-2 border border-gray-300 dark:border-dark-border dark:bg-dark-bg dark:text-white rounded-lg input-focus mobile-input-padding">
+            </div>
+            <div class="md:col-span-2">
+              <div id="loose-density-result" class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hidden">
+                <p class="font-medium text-gray-800 dark:text-white">松散堆积密度: <span id="loose-density-value" class="text-primary font-bold">--</span> g/cm³</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 密集堆积密度 -->
+        <div class="bg-white dark:bg-dark-card rounded-xl p-6 card-shadow dark:card-shadow-dark animate-fade-in hover-lift">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+            <i class="fa fa-cubes text-secondary mr-2"></i>
+            密集堆积密度
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="dense-container-weight" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">容量筒质量 (g)</label>
+              <input type="number" id="dense-container-weight" step="0.1" class="w-full px-4 py-2 border border-gray-300 dark:border-dark-border dark:bg-dark-bg dark:text-white rounded-lg input-focus mobile-input-padding">
+            </div>
+            <div>
+              <label for="dense-total-weight" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">容量筒+砂总质量 (g)</label>
+              <input type="number" id="dense-total-weight" step="0.1" class="w-full px-4 py-2 border border-gray-300 dark:border-dark-border dark:bg-dark-bg dark:text-white rounded-lg input-focus mobile-input-padding">
+            </div>
+            <div>
+              <label for="dense-container-volume" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">容量筒容积 (cm³)</label>
+              <input type="number" id="dense-container-volume" step="1" value="1000" class="w-full px-4 py-2 border border-gray-300 dark:border-dark-border dark:bg-dark-bg dark:text-white rounded-lg input-focus mobile-input-padding">
+            </div>
+            <div class="md:col-span-2">
+              <div id="dense-density-result" class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hidden">
+                <p class="font-medium text-gray-800 dark:text-white">密集堆积密度: <span id="dense-density-value" class="text-secondary font-bold">--</span> g/cm³</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 按钮区域 -->
+        <div class="flex flex-col sm:flex-row flex-wrap gap-4 animate-fade-in">
+          <button id="calculate-btn" class="btn-primary flex-1 mobile-btn-padding">
+            <i class="fa fa-calculator"></i>
+            <span>计算结果</span>
+          </button>
+          <button id="reset-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-all input-focus flex items-center justify-center gap-2 flex-1 mobile-btn-padding">
+            <i class="fa fa-refresh"></i>
+            <span>重置表单</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- 右侧结果和图表 -->
+      <div class="space-y-6">
+        <!-- 计算结果 -->
+        <div class="bg-white dark:bg-dark-card rounded-xl p-6 card-shadow dark:card-shadow-dark animate-fade-in hover-lift">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+            <i class="fa fa-bar-chart text-accent mr-2"></i>
+            计算结果
+          </h2>
+          <div class="space-y-3">
+            <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+              <p class="text-sm text-gray-600 dark:text-gray-300">松散堆积密度</p>
+              <p class="text-2xl font-bold text-primary" id="result-loose-density">--</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">g/cm³</p>
+            </div>
+            <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+              <p class="text-sm text-gray-600 dark:text-gray-300">密集堆积密度</p>
+              <p class="text-2xl font-bold text-secondary" id="result-dense-density">--</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">g/cm³</p>
+            </div>
+            <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+              <p class="text-sm text-gray-600 dark:text-gray-300">松散状态孔隙率</p>
+              <p class="text-2xl font-bold text-accent" id="result-loose-porosity">--</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">%</p>
+            </div>
+            <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+              <p class="text-sm text-gray-600 dark:text-gray-300">密集状态孔隙率</p>
+              <p class="text-2xl font-bold text-info" id="result-dense-porosity">--</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">%</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 可视化图表 -->
+        <div class="bg-white dark:bg-dark-card rounded-xl p-6 card-shadow dark:card-shadow-dark animate-fade-in hover-lift">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+            <i class="fa fa-pie-chart text-info mr-2"></i>
+            孔隙率对比
+          </h2>
+          <div class="chart-container">
+            <canvas id="porosity-chart"></canvas>
+          </div>
+        </div>
+        
+        <!-- 历史记录 -->
+        <div class="bg-white dark:bg-dark-card rounded-xl p-6 card-shadow dark:card-shadow-dark animate-fade-in hover-lift">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+              <i class="fa fa-history text-gray-500 mr-2"></i>
+              历史记录
+            </h2>
+            <button id="clear-history" class="text-xs text-gray-500 dark:text-gray-400 hover:text-danger dark:hover:text-danger">
+              清空
+            </button>
+          </div>
+          <div id="history-container" class="max-h-60 overflow-y-auto">
+            <div class="text-center text-gray-500 dark:text-gray-400 py-4 text-sm history-item">
+              暂无历史记录
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 帮助模态框 -->
+  <div id="help-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden animate-fade-in">
+    <div class="bg-white dark:bg-dark-card rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-6 mx-4">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white">使用说明</h3>
+        <button id="close-help" class="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white">
+          <i class="fa fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="space-y-4 text-gray-700 dark:text-gray-300">
+        <h4 class="font-semibold text-primary">计算原理</h4>
+        <p>堆积密度 = (容量筒+砂总质量 - 容量筒质量) / 容量筒容积</p>
+        <p>孔隙率 = (1 - 堆积密度/砂的密度) × 100%</p>
+        
+        <h4 class="font-semibold text-primary">使用方法</h4>
+        <ol class="list-decimal pl-5 space-y-1">
+          <li>填写基本信息和试验数据</li>
+          <li>输入松散堆积和密集堆积的相关质量</li>
+          <li>点击"计算结果"按钮</li>
+          <li>查看计算结果和可视化图表</li>
+        </ol>
+        
+        <h4 class="font-semibold text-primary">注意事项</h4>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>砂的密度一般取值为2.65 g/cm³</li>
+          <li>容量筒通常使用1000 cm³</li>
+          <li>输入数值需为有效的数字</li>
+          <li>按Enter键可快速计算，Esc键可重置表单</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 通知提示 -->
+  <div id="notification" class="fixed top-4 right-4 bg-white dark:bg-dark-card shadow-lg rounded-lg p-4 transform translate-x-full transition-transform duration-300 z-50 max-w-sm animate-fade-in hidden">
+    <div class="flex items-start gap-3">
+      <div id="notification-icon" class="text-primary mt-1">
+        <i class="fa fa-info-circle text-xl"></i>
+      </div>
+      <div class="flex-1">
+        <h4 id="notification-title" class="font-semibold text-gray-800 dark:text-white">通知</h4>
+        <p id="notification-message" class="text-sm text-gray-600 dark:text-gray-300">消息内容</p>
+      </div>
+      <button id="close-notification" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+  </div>
+  
+  <script>
+    // DOM元素引用
+    const calculateBtn = document.getElementById('calculate-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const themeToggle = document.getElementById('theme-toggle');
+    const helpBtn = document.getElementById('help-btn');
+    const helpModal = document.getElementById('help-modal');
+    const closeHelp = document.getElementById('close-help');
+    const clearHistory = document.getElementById('clear-history');
+    const historyContainer = document.getElementById('history-container');
+    const notification = document.getElementById('notification');
+    const closeNotification = document.getElementById('close-notification');
+    
+    // 输入字段实时验证
+    function setupRealTimeValidation() {
+      // 选择所有数值输入字段
+      const numberInputs = document.querySelectorAll('input[type="number"]');
+      
+      // 为每个数值输入字段添加实时验证
+      numberInputs.forEach(input => {
+        // 添加输入事件监听器
+        input.addEventListener('input', () => {
+          validateInput(input);
+        });
+        
+        // 添加失去焦点事件监听器
+        input.addEventListener('blur', () => {
+          validateInput(input, true);
+        });
+      });
+      
+      // 为文本输入字段添加实时验证
+      const textInputs = document.querySelectorAll('input[type="text"]');
+      textInputs.forEach(input => {
+        input.addEventListener('blur', () => {
+          if (input.id === 'sample-name' && input.value.length > 20) {
+            showInputError(input, '样品编号不能超过20个字符');
+          } else if (input.id === 'operator' && input.value.length > 10) {
+            showInputError(input, '试验人员姓名不能超过10个字符');
+          } else {
+            removeInputError(input);
+          }
+        });
+      });
+    }
+    
+    // 验证单个输入字段
+    function validateInput(input, showError = false) {
+      // 检查是否为空
+      if (input.value.trim() === '') {
+        if (showError) {
+          showInputError(input, '此字段不能为空');
+        }
+        return false;
+      }
+      
+      // 转换为数字
+      const value = parseFloat(input.value);
+      
+      // 检查是否为有效数字
+      if (isNaN(value)) {
+        showInputError(input, '请输入有效的数字');
+        return false;
+      }
+      
+      // 根据字段ID进行特定验证
+      if (input.id === 'sand-density') {
+        if (value < 2.5 || value > 2.75) {
+          showInputError(input, '砂的密度应在2.5-2.75 g/cm³之间');
+          return false;
+        }
+      } else if (input.id.includes('weight')) {
+        if (value <= 0) {
+          showInputError(input, '质量必须大于0');
+          return false;
+        }
+      } else if (input.id.includes('volume')) {
+        if (value <= 0) {
+          showInputError(input, '容积必须大于0');
+          return false;
+        }
+      }
+      
+      // 移除错误状态
+      removeInputError(input);
+      return true;
+    }
+    
+    // 显示输入错误
+    function showInputError(input, message) {
+      // 移除已有的错误提示
+      removeInputError(input);
+      
+      // 添加错误样式
+      input.classList.add('border-danger', 'focus:ring-danger/50', 'focus:border-danger');
+      
+      // 创建错误提示元素
+      const errorElement = document.createElement('div');
+      errorElement.className = 'text-danger text-xs mt-1 animate-fade-in';
+      errorElement.textContent = message;
+      errorElement.dataset.for = input.id;
+      
+      // 将错误提示元素添加到输入字段之后
+      input.parentNode.appendChild(errorElement);
+    }
+    
+    // 移除输入错误
+    function removeInputError(input) {
+      // 移除错误样式
+      input.classList.remove('border-danger', 'focus:ring-danger/50', 'focus:border-danger');
+      
+      // 移除错误提示元素
+      const errorElement = input.parentNode.querySelector(`[data-for="${input.id}"]`);
+      if (errorElement) {
+        errorElement.remove();
+      }
+    }
+    
+    // 验证整个表单
+    function validateForm() {
+      const looseContainerWeight = document.getElementById('loose-container-weight');
+      const looseTotalWeight = document.getElementById('loose-total-weight');
+      const looseContainerVolume = document.getElementById('loose-container-volume');
+      const denseContainerWeight = document.getElementById('dense-container-weight');
+      const denseTotalWeight = document.getElementById('dense-total-weight');
+      const denseContainerVolume = document.getElementById('dense-container-volume');
+      const sandDensity = document.getElementById('sand-density');
+      
+      // 验证所有必需的字段
+      const isLooseValid = validateInput(looseContainerWeight, true) && 
+                          validateInput(looseTotalWeight, true) && 
+                          validateInput(looseContainerVolume, true);
+      const isDenseValid = validateInput(denseContainerWeight, true) && 
+                          validateInput(denseTotalWeight, true) && 
+                          validateInput(denseContainerVolume, true);
+      const isSandDensityValid = validateInput(sandDensity, true);
+      
+      // 检查砂的总质量是否大于容器质量
+      const looseWeightValid = parseFloat(looseTotalWeight.value) > parseFloat(looseContainerWeight.value) || !isLooseValid;
+      const denseWeightValid = parseFloat(denseTotalWeight.value) > parseFloat(denseContainerWeight.value) || !isDenseValid;
+      
+      if (isLooseValid && !looseWeightValid) {
+        showInputError(looseTotalWeight, '砂的总质量必须大于容器质量');
+      }
+      
+      if (isDenseValid && !denseWeightValid) {
+        showInputError(denseTotalWeight, '砂的总质量必须大于容器质量');
+      }
+      
+      // 返回整体验证结果
+      return isLooseValid && isDenseValid && isSandDensityValid && looseWeightValid && denseWeightValid;
+    }
+    
+    // 显示加载状态
+    function showLoadingState(button) {
+      const originalContent = button.innerHTML;
+      button.disabled = true;
+      button.classList.add('opacity-70', 'cursor-not-allowed');
+      button.innerHTML = '<i class="fa fa-circle-o-notch fa-spin"></i> 处理中...';
+      
+      // 存储原始内容以便恢复
+      button.dataset.originalContent = originalContent;
+      
+      return function resetState() {
+        button.innerHTML = originalContent;
+        button.disabled = false;
+        button.classList.remove('opacity-70', 'cursor-not-allowed');
+        delete button.dataset.originalContent;
+      };
+    }
+    
+    // 计算函数
+    function calculate() {
+      // 清除所有错误提示
+      document.querySelectorAll('[data-for]').forEach(el => el.remove());
+      
+      // 验证表单
+      if (!validateForm()) {
+        showNotification('验证失败', '请检查输入数据并修复错误');
+        return;
+      }
+      
+      // 显示按钮加载状态
+      const resetButtonState = showLoadingState(calculateBtn);
+      
+      // 使用setTimeout模拟异步操作，提升用户体验
+      setTimeout(() => {
+        try {
+          // 获取输入值
+          const sampleName = document.getElementById('sample-name').value || '未知';
+          const testDate = document.getElementById('test-date').value || new Date().toISOString().split('T')[0];
+          const operator = document.getElementById('operator').value || '未知';
+          const sandDensity = parseFloat(document.getElementById('sand-density').value);
+          
+          // 松散堆积数据
+          const looseContainerWeight = parseFloat(document.getElementById('loose-container-weight').value);
+          const looseTotalWeight = parseFloat(document.getElementById('loose-total-weight').value);
+          const looseContainerVolume = parseFloat(document.getElementById('loose-container-volume').value);
+          
+          // 密集堆积数据
+          const denseContainerWeight = parseFloat(document.getElementById('dense-container-weight').value);
+          const denseTotalWeight = parseFloat(document.getElementById('dense-total-weight').value);
+          const denseContainerVolume = parseFloat(document.getElementById('dense-container-volume').value);
+          
+          // 计算松散堆积密度和孔隙率
+          const looseDensity = (looseTotalWeight - looseContainerWeight) / looseContainerVolume;
+          const loosePorosity = (1 - looseDensity / sandDensity) * 100;
+          
+          // 计算密集堆积密度和孔隙率
+          const denseDensity = (denseTotalWeight - denseContainerWeight) / denseContainerVolume;
+          const densePorosity = (1 - denseDensity / sandDensity) * 100;
+          
+          // 检查计算结果是否合理
+          if (isNaN(looseDensity) || isNaN(loosePorosity) || isNaN(denseDensity) || isNaN(densePorosity)) {
+            throw new Error('计算结果无效，请检查输入数据');
+          }
+          
+          // 显示结果
+          document.getElementById('loose-density-value').textContent = looseDensity.toFixed(2);
+          document.getElementById('dense-density-value').textContent = denseDensity.toFixed(2);
+          document.getElementById('result-loose-density').textContent = looseDensity.toFixed(2);
+          document.getElementById('result-dense-density').textContent = denseDensity.toFixed(2);
+          document.getElementById('result-loose-porosity').textContent = loosePorosity.toFixed(1);
+          document.getElementById('result-dense-porosity').textContent = densePorosity.toFixed(1);
+          
+          // 显示结果区域并添加动画效果
+          const looseResult = document.getElementById('loose-density-result');
+          const denseResult = document.getElementById('dense-density-result');
+          
+          looseResult.classList.remove('hidden');
+          denseResult.classList.remove('hidden');
+          
+          // 添加动画效果
+          looseResult.classList.add('animate-slide-up');
+          denseResult.classList.add('animate-slide-up');
+          
+          // 更新图表
+          updateChart(loosePorosity, densePorosity);
+          
+          // 保存到历史记录
+          const result = {
+            sampleName,
+            testDate,
+            operator,
+            looseDensity: looseDensity.toFixed(2),
+            denseDensity: denseDensity.toFixed(2),
+            loosePorosity: loosePorosity.toFixed(1),
+            densePorosity: densePorosity.toFixed(1),
+            timestamp: new Date().toISOString()
+          };
+          
+          saveToHistory(result);
+          showNotification('计算成功', '计算已完成，结果已保存到历史记录');
+          
+          // 滚动到结果区域（移动端优化）
+          if (window.innerWidth <= 768) {
+            document.getElementById('result-loose-density').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        } catch (error) {
+          showError(error.message || '计算过程中发生错误');
+        } finally {
+          // 恢复按钮状态
+          resetButtonState();
+        }
+      }, 500); // 短暂延迟以显示加载状态
+    }
+    
+    // 重置表单
+    function resetForm() {
+      // 显示按钮加载状态
+      const resetButtonState = showLoadingState(resetBtn);
+      
+      setTimeout(() => {
+        try {
+          // 重置输入字段
+          document.getElementById('sample-name').value = '';
+          document.getElementById('operator').value = '';
+          document.getElementById('loose-container-weight').value = '';
+          document.getElementById('loose-total-weight').value = '';
+          document.getElementById('dense-container-weight').value = '';
+          document.getElementById('dense-total-weight').value = '';
+          
+          // 移除所有错误提示
+          document.querySelectorAll('[data-for]').forEach(el => el.remove());
+          
+          // 移除错误样式
+          document.querySelectorAll('input').forEach(input => {
+            removeInputError(input);
+          });
+          
+          // 隐藏结果区域
+          document.getElementById('loose-density-result').classList.add('hidden');
+          document.getElementById('dense-density-result').classList.add('hidden');
+          
+          // 移除动画类
+          document.getElementById('loose-density-result').classList.remove('animate-slide-up');
+          document.getElementById('dense-density-result').classList.remove('animate-slide-up');
+          
+          // 重置结果显示
+          document.getElementById('result-loose-density').textContent = '--';
+          document.getElementById('result-dense-density').textContent = '--';
+          document.getElementById('result-loose-porosity').textContent = '--';
+          document.getElementById('result-dense-porosity').textContent = '--';
+          
+          // 清空图表
+          if (window.porosityChart) {
+            window.porosityChart.destroy();
+            initChart();
+          }
+          
+          showNotification('已重置', '所有输入和结果已重置');
+        } catch (error) {
+          showError('重置表单时发生错误');
+        } finally {
+          // 恢复按钮状态
+          resetButtonState();
+        }
+      }, 300);
+    }
+    
+    // 主题切换
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      
+      // 更新图表主题
+      if (window.porosityChart) {
+        const chartConfig = window.porosityChart.config;
+        if (isDark) {
+          chartConfig.options.scales.y.grid.color = 'rgba(255, 255, 255, 0.1)';
+          chartConfig.options.scales.x.grid.color = 'rgba(255, 255, 255, 0.1)';
+          chartConfig.options.scales.y.ticks.color = '#e5e7eb';
+          chartConfig.options.scales.x.ticks.color = '#e5e7eb';
+          chartConfig.options.plugins.legend.labels.color = '#e5e7eb';
+        } else {
+          chartConfig.options.scales.y.grid.color = 'rgba(0, 0, 0, 0.1)';
+          chartConfig.options.scales.x.grid.color = 'rgba(0, 0, 0, 0.1)';
+          chartConfig.options.scales.y.ticks.color = '#4b5563';
+          chartConfig.options.scales.x.ticks.color = '#4b5563';
+          chartConfig.options.plugins.legend.labels.color = '#4b5563';
+        }
+        window.porosityChart.update();
+      }
+      
+      // 显示主题切换通知
+      showNotification('主题已切换', `当前使用${isDark ? '深色' : '浅色'}主题`);
+    }
+    
+    // 初始化图表
+    function initChart() {
+      const ctx = document.getElementById('porosity-chart').getContext('2d');
+      const isDark = document.documentElement.classList.contains('dark');
+      
+      window.porosityChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['松散状态孔隙率', '密集状态孔隙率'],
+          datasets: [{
+            label: '孔隙率 (%)',
+            data: [0, 0],
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.7)',
+              'rgba(16, 185, 129, 0.7)'
+            ],
+            borderColor: [
+              'rgb(59, 130, 246)',
+              'rgb(16, 185, 129)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `孔隙率: ${context.raw.toFixed(1)}%`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              grid: {
+                color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+              },
+              ticks: {
+                color: isDark ? '#e5e7eb' : '#4b5563',
+                callback: function(value) {
+                  return value + '%';
+                }
+              },
+              title: {
+                display: true,
+                text: '孔隙率 (%)',
+                color: isDark ? '#e5e7eb' : '#4b5563'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: isDark ? '#e5e7eb' : '#4b5563'
+              }
+            }
+          },
+          animation: {
+            duration: 1000,
+            easing: 'easeInOutQuart'
+          }
+        }
+      });
+    }
+    
+    // 更新图表
+    function updateChart(loosePorosity, densePorosity) {
+      if (!window.porosityChart) {
+        initChart();
+      }
+      
+      window.porosityChart.data.datasets[0].data = [loosePorosity, densePorosity];
+      window.porosityChart.update();
+    }
+    
+    // 保存到历史记录
+    function saveToHistory(result) {
+      try {
+        let history = JSON.parse(localStorage.getItem('sandDensityHistory') || '[]');
+        history.unshift(result); // 添加到开头
+        
+        // 限制历史记录数量
+        if (history.length > 10) {
+          history = history.slice(0, 10);
+        }
+        
+        localStorage.setItem('sandDensityHistory', JSON.stringify(history));
+        updateHistoryDisplay();
+      } catch (error) {
+        console.error('保存历史记录失败:', error);
+        showError('无法保存历史记录');
+      }
+    }
+    
+    // 更新历史记录显示
+    function updateHistoryDisplay() {
+      try {
+        const history = JSON.parse(localStorage.getItem('sandDensityHistory') || '[]');
+        
+        if (history.length === 0) {
+          historyContainer.innerHTML = `
+            <div class="text-center text-gray-500 dark:text-gray-400 py-4 text-sm history-item">
+              暂无历史记录
+            </div>
+          `;
+          return;
+        }
+        
+        let html = '';
+        history.forEach((item, index) => {
+          html += `
+            <div class="border-b border-gray-200 dark:border-gray-700 py-2 last:border-b-0 animate-fade-in">
+              <div class="flex justify-between items-start mb-1">
+                <p class="font-medium text-gray-800 dark:text-white text-sm">${item.sampleName}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">${item.testDate}</p>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <p class="text-gray-600 dark:text-gray-300">松散: ${item.looseDensity} g/cm³ (${item.loosePorosity}%)</p>
+                <p class="text-gray-600 dark:text-gray-300">密集: ${item.denseDensity} g/cm³ (${item.densePorosity}%)</p>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">试验: ${item.operator}</p>
+            </div>
+          `;
+        });
+        
+        historyContainer.innerHTML = html;
+      } catch (error) {
+        console.error('更新历史记录显示失败:', error);
+        historyContainer.innerHTML = `
+          <div class="text-center text-danger py-4 text-sm">
+            加载历史记录失败
+          </div>
+        `;
+      }
+    }
+    
+    // 清空历史记录
+    function clearHistoryRecords() {
+      if (confirm('确定要清空所有历史记录吗？此操作无法撤销。')) {
+        // 显示按钮加载状态
+        const originalText = clearHistory.textContent;
+        clearHistory.disabled = true;
+        clearHistory.innerHTML = '<i class="fa fa-circle-o-notch fa-spin"></i>';
+        
+        setTimeout(() => {
+          try {
+            localStorage.removeItem('sandDensityHistory');
+            updateHistoryDisplay();
+            showNotification('已清空', '历史记录已全部删除');
+          } catch (error) {
+            showError('清空历史记录失败');
+          } finally {
+            clearHistory.textContent = originalText;
+            clearHistory.disabled = false;
+          }
+        }, 500);
+      }
+    }
+    
+    // 显示通知
+    function showNotification(title, message, type = 'info') {
+      // 清除现有的通知
+      hideNotification();
+      
+      // 设置通知内容
+      document.getElementById('notification-title').textContent = title;
+      document.getElementById('notification-message').textContent = message;
+      
+      // 设置通知图标和颜色
+      const notificationIcon = document.getElementById('notification-icon');
+      if (type === 'success') {
+        notificationIcon.className = 'text-secondary mt-1';
+        notificationIcon.innerHTML = '<i class="fa fa-check-circle text-xl"></i>';
+      } else if (type === 'error') {
+        notificationIcon.className = 'text-danger mt-1';
+        notificationIcon.innerHTML = '<i class="fa fa-exclamation-circle text-xl"></i>';
+      } else if (type === 'warning') {
+        notificationIcon.className = 'text-accent mt-1';
+        notificationIcon.innerHTML = '<i class="fa fa-exclamation-triangle text-xl"></i>';
+      } else {
+        notificationIcon.className = 'text-primary mt-1';
+        notificationIcon.innerHTML = '<i class="fa fa-info-circle text-xl"></i>';
+      }
+      
+      // 显示通知
+      notification.classList.remove('hidden');
+      
+      // 显示动画
+      setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+      }, 10);
+      
+      // 自动关闭
+      setTimeout(() => {
+        hideNotification();
+      }, 3000);
+    }
+    
+    // 隐藏通知
+    function hideNotification() {
+      notification.classList.add('translate-x-full');
+      setTimeout(() => {
+        notification.classList.add('hidden');
+      }, 300);
+    }
+    
+    // 显示错误消息
+    function showError(message) {
+      showNotification('错误', message, 'error');
+    }
+    
+    // 键盘快捷键
+    function setupKeyboardShortcuts() {
+      document.addEventListener('keydown', (e) => {
+        // 如果焦点在输入字段中，检查是否为Enter键
+        if (e.target.tagName === 'INPUT') {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            // 如果按下Tab + Enter，可以验证当前字段并移动到下一个字段
+            if (e.altKey) {
+              // 获取当前字段的索引
+              const inputs = Array.from(document.querySelectorAll('input'));
+              const currentIndex = inputs.indexOf(e.target);
+              
+              // 验证当前字段
+              validateInput(e.target, true);
+              
+              // 如果有下一个字段，移动焦点
+              if (currentIndex < inputs.length - 1) {
+                inputs[currentIndex + 1].focus();
+              }
+            } else {
+              // 否则，尝试计算
+              calculate();
+            }
+          }
+        } else {
+          // 如果焦点不在输入字段中
+          if (e.key === 'Enter') {
+            calculate();
+          } else if (e.key === 'Escape') {
+            resetForm();
+          } else if (e.key === 'h' && (e.altKey || e.ctrlKey)) {
+            e.preventDefault();
+            helpModal.classList.remove('hidden');
+          } else if (e.key === 't' && (e.altKey || e.ctrlKey)) {
+            e.preventDefault();
+            toggleTheme();
+          }
+        }
+      });
+    }
+    
+    // 辅助功能增强
+    function setupAccessibility() {
+      // 为按钮添加键盘焦点样式
+      document.querySelectorAll('button').forEach(button => {
+        button.setAttribute('tabindex', '0');
+        button.setAttribute('role', 'button');
+        
+        // 添加键盘事件
+        button.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            button.click();
+          }
+        });
+      });
+      
+      // 为输入字段添加适当的ARIA属性
+      document.querySelectorAll('input').forEach(input => {
+        const label = input.parentNode.querySelector('label');
+        if (label) {
+          input.setAttribute('aria-label', label.textContent);
+        }
+      });
+    }
+    
+    // 初始化
+    function init() {
+      // 检查主题设置
+      if (localStorage.getItem('theme') === 'dark' || 
+              (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+      
+      // 初始化图表
+      initChart();
+      
+      // 加载历史记录
+      updateHistoryDisplay();
+      
+      // 设置当前日期
+      document.getElementById('test-date').value = new Date().toISOString().split('T')[0];
+      
+      // 设置实时输入验证
+      setupRealTimeValidation();
+      
+      // 设置键盘快捷键
+      setupKeyboardShortcuts();
+      
+      // 设置辅助功能
+      setupAccessibility();
+      
+      // 添加事件监听器
+      calculateBtn.addEventListener('click', calculate);
+      resetBtn.addEventListener('click', resetForm);
+      themeToggle.addEventListener('click', toggleTheme);
+      helpBtn.addEventListener('click', () => helpModal.classList.remove('hidden'));
+      closeHelp.addEventListener('click', () => helpModal.classList.add('hidden'));
+      clearHistory.addEventListener('click', clearHistoryRecords);
+      closeNotification.addEventListener('click', hideNotification);
+      
+      // 点击模态框背景关闭
+      helpModal.addEventListener('click', (e) => {
+        if (e.target === helpModal) {
+          helpModal.classList.add('hidden');
+        }
+      });
+      
+      // 显示欢迎消息
+      if (!localStorage.getItem('sandCalculatorWelcomeShown')) {
+        setTimeout(() => {
+          showNotification('欢迎使用', '砂子堆积密度和孔隙率实验计算器已准备就绪', 'success');
+          localStorage.setItem('sandCalculatorWelcomeShown', 'true');
+        }, 500);
+      }
+    }
+    
+    // 页面加载完成后初始化
+    window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
