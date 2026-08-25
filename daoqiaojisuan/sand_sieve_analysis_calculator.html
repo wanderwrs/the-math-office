@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>砂筛分实验计算器 - 道桥计算工具</title>
+    <style>
+        :root {
+            --light-bg: #f8f9fa;
+            --light-text: #212529;
+            --light-primary: #007bff;
+            --light-secondary: #6c757d;
+            --light-card-bg: #ffffff;
+            --light-border: #dee2e6;
+            --light-input-bg: #ffffff;
+            --light-input-border: #ced4da;
+            --light-button-bg: #007bff;
+            --light-button-hover: #0056b3;
+            --light-error: #dc3545;
+            --light-success: #28a745;
+            --light-info: #17a2b8;
+            --gradient-primary: linear-gradient(135deg, #007bff, #0056b3);
+            --gradient-secondary: linear-gradient(135deg, #6c757d, #545b62);
+            --gradient-warning: linear-gradient(135deg, #ffc107, #e0a800);
+        }
+
+        .dark-mode {
+            --light-bg: #1a1a1a;
+            --light-text: #e9ecef;
+            --light-primary: #4dabf7;
+            --light-secondary: #adb5bd;
+            --light-card-bg: #2d3748;
+            --light-border: #4a5568;
+            --light-input-bg: #374151;
+            --light-input-border: #4b5563;
+            --light-button-bg: #4dabf7;
+            --light-button-hover: #339af0;
+            --light-error: #ff6b6b;
+            --light-success: #51cf66;
+            --light-info: #339af0;
+            --gradient-primary: linear-gradient(135deg, #4dabf7, #339af0);
+            --gradient-secondary: linear-gradient(135deg, #adb5bd, #868e96);
+            --gradient-warning: linear-gradient(135deg, #ffd43b, #fcc419);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--light-text);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        #theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        main {
+            padding: 40px 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--light-primary);
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            color: var(--light-secondary);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: var(--light-card-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--light-border);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--light-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--light-text);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"] {
+            padding: 12px 16px;
+            border: 2px solid var(--light-input-border);
+            border-radius: 8px;
+            background-color: var(--light-input-bg);
+            color: var(--light-text);
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="number"]:focus {
+            outline: none;
+            border-color: var(--light-primary);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .input-group input {
+            flex: 1;
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+
+        .input-group .input-group-append {
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            background-color: var(--light-secondary);
+            color: white;
+            border: 2px solid var(--light-secondary);
+            border-left: none;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .error-message {
+            color: var(--light-error);
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--light-button-bg);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--light-button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: var(--light-secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: center;
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        th {
+            background-color: rgba(0, 123, 255, 0.05);
+            font-weight: 600;
+            color: var(--light-primary);
+        }
+
+        tr:hover {
+            background-color: rgba(0, 123, 255, 0.02);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: rgba(0, 123, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--light-primary);
+        }
+
+        .result-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--light-primary);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: var(--light-primary);
+            font-size: 1.1rem;
+        }
+
+        .result-status {
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #d39e00;
+        }
+
+        .status-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #218838;
+        }
+
+        .status-error {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #c82333;
+        }
+
+        .status-info {
+            background-color: rgba(23, 162, 184, 0.1);
+            color: #138496;
+        }
+
+        .info-card {
+            background-color: rgba(23, 162, 184, 0.05);
+            border-left: 4px solid var(--light-info);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .info-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--light-info);
+        }
+
+        .info-content {
+            margin-bottom: 15px;
+        }
+
+        .info-content ul {
+            margin-left: 20px;
+        }
+
+        .info-content li {
+            margin-bottom: 8px;
+        }
+
+        .info-formula {
+            background-color: var(--light-card-bg);
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 10px 0;
+            border: 1px solid var(--light-border);
+        }
+
+        footer {
+            background-color: var(--light-card-bg);
+            border-top: 1px solid var(--light-border);
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            text-align: center;
+            color: var(--light-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+    <!-- 统一样式 -->
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="index.html" class="navbar-brand">🧮 道路工程计算器</a>
+            <div class="navbar-actions">
+                <a href="index.html" class="btn-home">🏠 返回首页</a>
+                <button id="theme-toggle" class="btn-theme" title="切换主题">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1>砂筛分实验计算器</h1>
+                <p>用于计算砂料的分计筛余百分率、累计筛余百分率，并判断各筛筛余质量是否超出上限</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📊 实验参数输入</h2>
+                </div>
+                <form id="sieve-analysis-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="sample-name">样品名称</label>
+                            <input type="text" id="sample-name" placeholder="请输入样品名称（可选）">
+                        </div>
+                        <div class="form-group">
+                            <label for="test-date">测试日期</label>
+                            <input type="date" id="test-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="total-mass">试样总质量 (g)</label>
+                            <div class="input-group">
+                                <input type="number" id="total-mass" min="0" step="0.1" placeholder="请输入试样总质量" value="500">
+                                <div class="input-group-append">g</div>
+                            </div>
+                            <div id="total-mass-error" class="error-message"></div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 30px; margin-bottom: 20px; color: var(--light-primary);">筛孔尺寸与筛余质量</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>筛孔尺寸 (mm)</th>
+                                    <th>筛余质量 (g)</th>
+                                    <th>分计筛余百分率 (%)</th>
+                                    <th>累计筛余百分率 (%)</th>
+                                    <th>筛余质量上限 (g)</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>4.75</td>
+                                    <td>
+                                        <input type="number" class="sieve-mass" data-size="4.75" min="0" step="0.1" placeholder="0">
+                                        <div class="error-message" id="mass-4.75-error"></div>
+                                    </td>
+                                    <td class="individual-percentage">--</td>
+                                    <td class="cumulative-percentage">--</td>
+                                    <td class="mass-limit">--</td>
+                                    <td class="status"></td>
+                                </tr>
+                                <tr>
+                                    <td>2.36</td>
+                                    <td>
+                                        <input type="number" class="sieve-mass" data-size="2.36" min="0" step="0.1" placeholder="0">
+                                        <div class="error-message" id="mass-2.36-error"></div>
+                                    </td>
+                                    <td class="individual-percentage">--</td>
+                                    <td class="cumulative-percentage">--</td>
+                                    <td class="mass-limit">--</td>
+                                    <td class="status"></td>
+                                </tr>
+                                <tr>
+                                    <td>1.18</td>
+                                    <td>
+                                        <input type="number" class="sieve-mass" data-size="1.18" min="0" step="0.1" placeholder="0">
+                                        <div class="error-message" id="mass-1.18-error"></div>
+                                    </td>
+                                    <td class="individual-percentage">--</td>
+                                    <td class="cumulative-percentage">--</td>
+                                    <td class="mass-limit">--</td>
+                                    <td class="status"></td>
+                                </tr>
+                                <tr>
+                                    <td>0.60</td>
+                                    <td>
+                                        <input type="number" class="sieve-mass" data-size="0.60" min="0" step="0.1" placeholder="0">
+                                        <div class="error-message" id="mass-0.60-error"></div>
+                                    </td>
+                                    <td class="individual-percentage">--</td>
+                                    <td class="cumulative-percentage">--</td>
+                                    <td class="mass-limit">--</td>
+                                    <td class="status"></td>
+                                </tr>
+                                <tr>
+                                    <td>0.30</td>
+                                    <td>
+                                        <input type="number" class="sieve-mass" data-size="0.30" min="0" step="0.1" placeholder="0">
+                                        <div class="error-message" id="mass-0.30-error"></div>
+                                    </td>
+                                    <td class="individual-percentage">--</td>
+                                    <td class="cumulative-percentage">--</td>
+                                    <td class="mass-limit">--</td>
+                                    <td class="status"></td>
+                                </tr>
+                                <tr>
+                                    <td>0.15</td>
+                                    <td>
+                                        <input type="number" class="sieve-mass" data-size="0.15" min="0" step="0.1" placeholder="0">
+                                        <div class="error-message" id="mass-0.15-error"></div>
+                                    </td>
+                                    <td class="individual-percentage">--</td>
+                                    <td class="cumulative-percentage">--</td>
+                                    <td class="mass-limit">--</td>
+                                    <td class="status"></td>
+                                </tr>
+                                <tr>
+                                    <td>筛底</td>
+                                    <td>
+                                        <input type="number" class="sieve-mass" data-size="bottom" min="0" step="0.1" placeholder="0">
+                                        <div class="error-message" id="mass-bottom-error"></div>
+                                    </td>
+                                    <td class="individual-percentage">--</td>
+                                    <td class="cumulative-percentage">--</td>
+                                    <td class="mass-limit">--</td>
+                                    <td class="status"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">计算结果</button>
+                        <button type="reset" class="btn btn-secondary">重置表单</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📈 计算结果</h2>
+                </div>
+                <div id="results-container">
+                    <div class="result-section">
+                        <h3 class="result-title">基本信息</h3>
+                        <div class="result-item">
+                            <span class="result-label">样品名称</span>
+                            <span id="result-sample" class="result-value">--</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">测试日期</span>
+                            <span id="result-date" class="result-value">--</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">试样总质量</span>
+                            <span id="result-total-mass" class="result-value">--</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">筛余总质量</span>
+                            <span id="result-sum-mass" class="result-value">--</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">质量偏差</span>
+                            <span id="result-deviation" class="result-value">--</span>
+                        </div>
+                    </div>
+
+                    <div class="result-section" style="margin-top: 20px;">
+                        <h3 class="result-title">计算结果</h3>
+                        <div class="result-item">
+                            <span class="result-label">分计筛余百分率之和</span>
+                            <span id="result-sum-individual" class="result-value">--</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">最大累计筛余百分率</span>
+                            <span id="result-max-cumulative" class="result-value">--</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">砂料评定</span>
+                            <span id="result-status" class="result-status status-info">等待计算</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3 class="info-title">📋 计算说明</h3>
+                <div class="info-content">
+                    <h4>计算公式：</h4>
+                    <p>1. 分计筛余百分率：</p>
+                    <div class="info-formula">a<sub>i</sub> = (m<sub>i</sub> / m) × 100%</div>
+                    <p>其中：a<sub>i</sub>为第i号筛的分计筛余百分率，m<sub>i</sub>为第i号筛的筛余质量，m为试样总质量</p>
+                    
+                    <p>2. 累计筛余百分率：</p>
+                    <div class="info-formula">A<sub>i</sub> = a<sub>1</sub> + a<sub>2</sub> + ... + a<sub>i</sub></div>
+                    <p>其中：A<sub>i</sub>为第i号筛的累计筛余百分率</p>
+
+                    <h4>筛余质量上限判断标准：</h4>
+                    <p>根据相关标准，各筛筛余质量应符合以下要求：</p>
+                    <ul>
+                        <li>对于500g试样，各筛筛余质量上限为试样总质量的±1%</li>
+                        <li>筛余总质量与试样总质量的差值不应超过1%</li>
+                    </ul>
+
+                    <h4>实验要点：</h4>
+                    <ul>
+                        <li>筛分实验前应将砂样烘干至恒重</li>
+                        <li>称量应准确至0.1g</li>
+                        <li>筛分过程应连续进行，避免中断</li>
+                        <li>对于难以筛分的颗粒，应用毛刷轻轻刷动</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>© 2024 道桥计算工具 - 砂筛分实验计算器</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 设置默认日期为今天
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('test-date').value = today;
+            
+            // 初始化主题
+            if (localStorage.getItem('theme') === 'dark' || 
+                (!localStorage.getItem('theme') && 
+                 window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('theme-toggle').innerHTML = '☀️';
+            }
+
+            // 计算筛余质量上限（默认总质量500g）
+            updateMassLimits();
+        });
+
+        // 主题切换功能
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            this.innerHTML = isDarkMode ? '☀️' : '🌙';
+        });
+
+        // 更新筛余质量上限
+        document.getElementById('total-mass').addEventListener('input', updateMassLimits);
+
+        function updateMassLimits() {
+            const totalMass = parseFloat(document.getElementById('total-mass').value) || 0;
+            const massLimit = totalMass * 0.01; // 1%的总质量作为上限
+            
+            const limitCells = document.querySelectorAll('.mass-limit');
+            limitCells.forEach(cell => {
+                cell.textContent = massLimit.toFixed(1) + 'g';
+            });
+        }
+
+        // 表单提交事件处理
+        document.getElementById('sieve-analysis-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateSieveAnalysis();
+        });
+
+        // 重置按钮事件处理
+        document.getElementById('sieve-analysis-form').addEventListener('reset', function() {
+            setTimeout(function() {
+                resetResults();
+                hideErrors();
+                updateMassLimits();
+            }, 0);
+        });
+
+        // 重置结果显示
+        function resetResults() {
+            // 重置基本信息
+            document.getElementById('result-sample').textContent = '--';
+            document.getElementById('result-date').textContent = '--';
+            document.getElementById('result-total-mass').textContent = '--';
+            document.getElementById('result-sum-mass').textContent = '--';
+            document.getElementById('result-deviation').textContent = '--';
+            document.getElementById('result-sum-individual').textContent = '--';
+            document.getElementById('result-max-cumulative').textContent = '--';
+            document.getElementById('result-status').textContent = '等待计算';
+            document.getElementById('result-status').className = 'result-status status-info';
+            
+            // 重置表格数据
+            const percentageCells = document.querySelectorAll('.individual-percentage, .cumulative-percentage');
+            percentageCells.forEach(cell => {
+                cell.textContent = '--';
+            });
+            
+            const statusCells = document.querySelectorAll('.status');
+            statusCells.forEach(cell => {
+                cell.textContent = '';
+                cell.className = 'status';
+            });
+        }
+
+        // 计算砂筛分实验结果
+        function calculateSieveAnalysis() {
+            // 获取输入值
+            const sampleName = document.getElementById('sample-name').value || '未命名';
+            const testDate = document.getElementById('test-date').value;
+            const totalMass = parseFloat(document.getElementById('total-mass').value);
+            
+            // 验证输入
+            let isValid = true;
+            hideErrors();
+            
+            if (isNaN(totalMass) || totalMass <= 0) {
+                showError('total-mass-error', '请输入有效的试样总质量');
+                isValid = false;
+            }
+            
+            // 获取所有筛的筛余质量
+            const sieveMasses = [];
+            const sieveElements = document.querySelectorAll('.sieve-mass');
+            
+            sieveElements.forEach(element => {
+                const size = element.getAttribute('data-size');
+                const mass = parseFloat(element.value) || 0;
+                
+                if (isNaN(mass) || mass < 0) {
+                    showError(`mass-${size}-error`, '请输入有效的筛余质量');
+                    isValid = false;
+                }
+                
+                sieveMasses.push({ size, mass });
+            });
+            
+            if (!isValid) return;
+            
+            // 计算筛余总质量
+            const sumMass = sieveMasses.reduce((sum, sieve) => sum + sieve.mass, 0);
+            
+            // 计算偏差
+            const deviation = ((sumMass - totalMass) / totalMass) * 100;
+            
+            // 计算分计筛余百分率
+            let cumulativePercentage = 0;
+            const results = sieveMasses.map(sieve => {
+                const individualPercentage = (sieve.mass / totalMass) * 100;
+                cumulativePercentage += individualPercentage;
+                
+                // 计算筛余质量上限
+                const massLimit = totalMass * 0.01; // 1%的总质量
+                let status = '';
+                let statusClass = '';
+                
+                if (sieve.mass > massLimit) {
+                    status = '超出上限';
+                    statusClass = 'status-error';
+                } else {
+                    status = '正常';
+                    statusClass = 'status-success';
+                }
+                
+                return {
+                    ...sieve,
+                    individualPercentage,
+                    cumulativePercentage,
+                    status,
+                    statusClass
+                };
+            });
+            
+            // 更新结果显示
+            updateResults({
+                sampleName,
+                testDate,
+                totalMass,
+                sumMass,
+                deviation,
+                results,
+                sumIndividual: results.reduce((sum, item) => sum + item.individualPercentage, 0),
+                maxCumulative: cumulativePercentage
+            });
+        }
+
+        // 更新结果显示
+        function updateResults(data) {
+            // 更新基本信息
+            document.getElementById('result-sample').textContent = data.sampleName;
+            document.getElementById('result-date').textContent = data.testDate;
+            document.getElementById('result-total-mass').textContent = data.totalMass.toFixed(1) + 'g';
+            document.getElementById('result-sum-mass').textContent = data.sumMass.toFixed(1) + 'g';
+            document.getElementById('result-deviation').textContent = Math.abs(data.deviation).toFixed(2) + '%';
+            document.getElementById('result-sum-individual').textContent = data.sumIndividual.toFixed(2) + '%';
+            document.getElementById('result-max-cumulative').textContent = data.maxCumulative.toFixed(2) + '%';
+            
+            // 更新结果状态
+            const statusElement = document.getElementById('result-status');
+            let statusText = '';
+            let statusClass = '';
+            
+            if (Math.abs(data.deviation) > 1) {
+                statusText = '质量偏差超出允许范围';
+                statusClass = 'status-error';
+            } else {
+                // 检查是否有筛余质量超出上限
+                const hasExceededLimit = data.results.some(item => item.statusClass === 'status-error');
+                if (hasExceededLimit) {
+                    statusText = '存在筛余质量超出上限';
+                    statusClass = 'status-warning';
+                } else {
+                    statusText = '计算完成，结果正常';
+                    statusClass = 'status-success';
+                }
+            }
+            
+            statusElement.textContent = statusText;
+            statusElement.className = `result-status ${statusClass}`;
+            
+            // 更新表格数据
+            const tableRows = document.querySelectorAll('tbody tr');
+            data.results.forEach((result, index) => {
+                if (index < tableRows.length) {
+                    const row = tableRows[index];
+                    const individualCell = row.querySelector('.individual-percentage');
+                    const cumulativeCell = row.querySelector('.cumulative-percentage');
+                    const statusCell = row.querySelector('.status');
+                    
+                    individualCell.textContent = result.individualPercentage.toFixed(2) + '%';
+                    cumulativeCell.textContent = result.cumulativePercentage.toFixed(2) + '%';
+                    statusCell.textContent = result.status;
+                    statusCell.className = `status ${result.statusClass}`;
+                }
+            });
+        }
+
+        // 显示错误信息
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        // 隐藏所有错误信息
+        function hideErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(element => {
+                element.style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>
