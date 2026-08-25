@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水泥胶砂强度试验计算器</title>
+    <style>
+        /* 基础样式 */
+        :root {
+            --bg-primary: #f9fafb;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-tertiary: #9ca3af;
+            --border-color: #e5e7eb;
+            --accent-primary: #3b82f6;
+            --accent-hover: #2563eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+        }
+
+        /* 深色模式 */
+        .dark {
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --bg-tertiary: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-tertiary: #9ca3af;
+            --border-color: #4b5563;
+            --accent-primary: #3b82f6;
+            --accent-hover: #60a5fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏 */
+        nav {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .nav-icon {
+            margin-right: 8px;
+            font-size: 24px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        /* 主内容 */
+        main {
+            padding: 24px 0;
+        }
+
+        .calculator-container {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .input-section {
+            background-color: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .input-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        /* 结果区域 */
+        .result-section {
+            background-color: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-size: 14px;
+            color: var(--text-tertiary);
+        }
+
+        .result-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .result-value.success {
+            color: var(--success-color);
+        }
+
+        .result-value.warning {
+            color: var(--warning-color);
+        }
+
+        .result-value.error {
+            color: var(--error-color);
+        }
+
+        /* 公式说明 */
+        .formula-section {
+            background-color: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .formula-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        .formula-item {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .formula-note {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 8px;
+        }
+
+        /* 状态指示器 */
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status.warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+        }
+
+        /* 页脚 */
+        footer {
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 16px 0;
+            margin-top: 40px;
+        }
+
+        .footer-text {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-tertiary);
+        }
+
+        /* 返回首页按钮 */
+        .back-to-home {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            background-color: var(--accent-primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .back-to-home:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 640px) {
+            .calculator-container {
+                padding: 16px;
+            }
+            
+            .page-title {
+                font-size: 20px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <!-- 统一样式 -->
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="index.html" class="navbar-brand">🧮 道路工程计算器</a>
+            <div class="navbar-actions">
+                <a href="index.html" class="btn-home">🏠 返回首页</a>
+                <button id="theme-toggle" class="btn-theme" title="切换主题"><span id="theme-icon">🌙</span></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="container">
+        <a href="index.html" class="back-to-home">
+            ← 返回首页
+        </a>
+        
+        <div class="calculator-container">
+            <h1 class="page-title">水泥胶砂强度试验计算器</h1>
+            
+            <div class="grid">
+                <!-- 左侧：计算参数 -->
+                <div>
+                    <h2 class="section-title">计算参数</h2>
+                    
+                    <!-- 抗折实验 -->
+                    <div class="input-section">
+                        <h3 class="input-title">抗折实验</h3>
+                        <div class="input-group">
+                            <label class="input-label" for="flexural-load">极限载荷 (kN)</label>
+                            <input type="number" id="flexural-load" class="input-field" placeholder="请输入极限载荷">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label" for="flexural-strength">抗折强度 (MPa)</label>
+                            <input type="number" id="flexural-strength" class="input-field" placeholder="请输入抗折强度">
+                        </div>
+                    </div>
+                    
+                    <!-- 抗压实验 -->
+                    <div class="input-section">
+                        <h3 class="input-title">抗压实验</h3>
+                        <div class="input-group">
+                            <label class="input-label" for="compressive-load">极限载荷 (kN)</label>
+                            <input type="number" id="compressive-load" class="input-field" placeholder="请输入极限载荷">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label" for="compressive-strength">抗压强度 (MPa)</label>
+                            <input type="number" id="compressive-strength" class="input-field" placeholder="请输入抗压强度">
+                        </div>
+                    </div>
+                    
+                    <!-- 计算和重置按钮 -->
+                    <div class="btn-group">
+                        <button id="calculate-btn" class="btn btn-primary">
+                            🧮 计算
+                        </button>
+                        <button id="reset-btn" class="btn btn-secondary">
+                            🔄 重置
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 右侧：计算结果 -->
+                <div>
+                    <h2 class="section-title">计算结果</h2>
+                    
+                    <!-- 结果显示 -->
+                    <div class="result-section">
+                        <div class="result-item">
+                            <span class="result-label">抗折实验平均</span>
+                            <span id="flexural-avg-mpa" class="result-value">--</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">抗压试验</span>
+                            <span id="compressive-mpa" class="result-value">--</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">计算状态</span>
+                            <span id="calculation-status" class="result-value">--</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 公式说明 -->
+                    <div class="formula-section">
+                        <h3 class="formula-title">计算公式</h3>
+                        <div class="formula-item">抗折强度 = 3F/(2bh²) MPa</div>
+                        <div class="formula-item">抗压强度 = F/A MPa</div>
+                        <p class="formula-note">注：F为极限载荷(N)，b和h为试体截面尺寸(mm)，A为受压面积(mm²)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <p class="footer-text">© 2023 道路工程计算器集合 | 水泥胶砂强度试验计算器</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 主题切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const htmlElement = document.documentElement;
+            
+            // 检查保存的主题设置
+            if (localStorage.getItem('theme') === 'dark' || 
+                (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                htmlElement.classList.add('dark');
+                themeIcon.textContent = '☀️';
+            } else {
+                themeIcon.textContent = '🌙';
+            }
+            
+            themeToggle.addEventListener('click', function() {
+                htmlElement.classList.toggle('dark');
+                const isDark = htmlElement.classList.contains('dark');
+                themeIcon.textContent = isDark ? '☀️' : '🌙';
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            });
+            
+            // 初始化计算器
+            initCalculator();
+        });
+        
+        // 计算器功能
+        function initCalculator() {
+            const calculateBtn = document.getElementById('calculate-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            
+            // 计算按钮点击事件
+            calculateBtn.addEventListener('click', function() {
+                // 获取输入值
+                const flexuralLoad = parseFloat(document.getElementById('flexural-load').value) || 0;
+                const flexuralStrength = parseFloat(document.getElementById('flexural-strength').value) || 0;
+                const compressiveLoad = parseFloat(document.getElementById('compressive-load').value) || 0;
+                const compressiveStrength = parseFloat(document.getElementById('compressive-strength').value) || 0;
+                
+                // 初始化结果元素
+                const flexuralAvgMpaElem = document.getElementById('flexural-avg-mpa');
+                const compressiveMpaElem = document.getElementById('compressive-mpa');
+                const calculationStatusElem = document.getElementById('calculation-status');
+                
+                // 输入验证
+                if (!validateInputs(flexuralLoad, flexuralStrength, compressiveLoad, compressiveStrength)) {
+                    return;
+                }
+                
+                // 计算抗折实验平均MPa
+                const flexuralAvgMpa = flexuralStrength > 0 ? flexuralStrength : 
+                                       (flexuralLoad > 0 ? calculateFlexuralStrength(flexuralLoad) : 0);
+                
+                // 计算抗压试验MPa
+                const compressiveMpa = compressiveStrength > 0 ? compressiveStrength : 
+                                      (compressiveLoad > 0 ? calculateCompressiveStrength(compressiveLoad) : 0);
+                
+                // 更新计算状态
+                let status = '计算完成';
+                let statusClass = 'success';
+                
+                if (flexuralLoad === 0 && flexuralStrength === 0) {
+                    status += ' - 缺少抗折实验数据';
+                    statusClass = 'warning';
+                }
+                if (compressiveLoad === 0 && compressiveStrength === 0) {
+                    status += ' - 缺少抗压实验数据';
+                    statusClass = 'error';
+                }
+                
+                // 显示结果
+                if (flexuralAvgMpa > 0) {
+                    flexuralAvgMpaElem.textContent = flexuralAvgMpa.toFixed(2) + ' MPa';
+                    flexuralAvgMpaElem.classList.add('success');
+                } else {
+                    flexuralAvgMpaElem.textContent = '--';
+                    flexuralAvgMpaElem.classList.remove('success', 'warning', 'error');
+                }
+                
+                if (compressiveMpa > 0) {
+                    compressiveMpaElem.textContent = compressiveMpa.toFixed(2) + ' MPa';
+                    compressiveMpaElem.classList.add('success');
+                } else {
+                    compressiveMpaElem.textContent = '--';
+                    compressiveMpaElem.classList.remove('success', 'warning', 'error');
+                }
+                
+                // 重置之前的类并添加新类
+                calculationStatusElem.classList.remove('success', 'warning', 'error');
+                calculationStatusElem.classList.add(statusClass);
+                calculationStatusElem.textContent = status;
+            });
+            
+            // 重置按钮点击事件
+            resetBtn.addEventListener('click', function() {
+                // 清空所有输入
+                document.getElementById('flexural-load').value = '';
+                document.getElementById('flexural-strength').value = '';
+                document.getElementById('compressive-load').value = '';
+                document.getElementById('compressive-strength').value = '';
+                
+                // 重置所有结果
+                const flexuralAvgMpaElem = document.getElementById('flexural-avg-mpa');
+                const compressiveMpaElem = document.getElementById('compressive-mpa');
+                const calculationStatusElem = document.getElementById('calculation-status');
+                
+                flexuralAvgMpaElem.textContent = '--';
+                compressiveMpaElem.textContent = '--';
+                calculationStatusElem.textContent = '--';
+                
+                // 移除所有状态类
+                flexuralAvgMpaElem.classList.remove('success', 'warning', 'error');
+                compressiveMpaElem.classList.remove('success', 'warning', 'error');
+                calculationStatusElem.classList.remove('success', 'warning', 'error');
+            });
+        }
+        
+        // 输入验证函数
+        function validateInputs(flexuralLoad, flexuralStrength, compressiveLoad, compressiveStrength) {
+            // 检查是否提供了至少一组数据
+            if (flexuralLoad === 0 && flexuralStrength === 0 && 
+                compressiveLoad === 0 && compressiveStrength === 0) {
+                alert('请至少输入一项抗折或抗压实验数据');
+                return false;
+            }
+            
+            // 检查数值是否为负数
+            if (flexuralLoad < 0 || flexuralStrength < 0 || 
+                compressiveLoad < 0 || compressiveStrength < 0) {
+                alert('输入值不能为负数');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // 计算抗折强度 (MPa)
+        // 公式: 抗折强度 = 3F/(2bh²) MPa
+        // 假设标准试体尺寸: 40mm×40mm×160mm，支撑跨度100mm
+        function calculateFlexuralStrength(load) {
+            const b = 40; // mm
+            const h = 40; // mm
+            const l = 100; // mm，支撑跨度
+            
+            // 将kN转换为N进行计算
+            const loadN = load * 1000;
+            
+            // 计算抗折强度 MPa = N/mm²
+            const strength = (3 * loadN * l) / (2 * b * Math.pow(h, 2));
+            
+            return strength;
+        }
+        
+        // 计算抗压强度 (MPa)
+        // 公式: 抗压强度 = F/A MPa
+        // 假设受压面积为40mm×40mm
+        function calculateCompressiveStrength(load) {
+            const A = 40 * 40; // mm²，受压面积
+            
+            // 将kN转换为N进行计算
+            const loadN = load * 1000;
+            
+            // 计算抗压强度 MPa = N/mm²
+            const strength = loadN / A;
+            
+            return strength;
+        }
+    </script>
+</body>
+</html>
